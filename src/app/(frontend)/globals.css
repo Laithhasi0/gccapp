@@ -216,6 +216,15 @@
   animation: page-enter 0.35s var(--ease) both;
 }
 
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(var(--reveal-y, 20px)); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal {
+  animation: reveal-up 0.65s var(--ease) var(--reveal-delay, 0s) both;
+  will-change: opacity, transform;
+}
+
 /* Animated background glow drift */
 @keyframes drift-a {
   0%, 100% { transform: translate(0, 0) scale(1); }
@@ -246,8 +255,10 @@
   html { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
   }
   .hover-lift:hover { transform: none; }

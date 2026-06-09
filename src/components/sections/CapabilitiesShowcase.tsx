@@ -118,7 +118,7 @@ export function CapabilitiesShowcase({
         </Container>
 
         <div className="relative h-[clamp(28rem,70vh,40rem)]">
-          <AnimatePresence>
+          <AnimatePresence initial={false}>
             <motion.div
               key={active}
               initial={{ opacity: 0, y: 24 }}

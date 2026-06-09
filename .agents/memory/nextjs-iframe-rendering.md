@@ -12,12 +12,15 @@ If `next.config.ts` `headers()` sets `X-Frame-Options: SAMEORIGIN`, the browser 
 
 **How to apply:** when a Next.js app shows blank ONLY in the iframe preview but the screenshot tool works, check `headers()` in next.config.ts first.
 
-## 2. JS-driven `opacity:0` wrappers leave content invisible ("only the footer shows")
-The App Router `template.tsx` wrapped all page content in a Framer Motion `motion.div` with `initial={{opacity:0}}` → `animate={{opacity:1}}`. The footer lives in `layout.tsx` (outside the template) so it stayed visible, but everything inside the template depended on client-side JS completing the animation. In the throttled iframe context the animation didn't run, so content was stuck at `opacity:0`.
+## 2. JS-driven `opacity:0` reveals leave content invisible ("only the footer shows")
+Any element rendered with `opacity:0` that relies on client JS to become visible can get stuck invisible inside Replit's iframe (the footer in `layout.tsx` has no opacity gate, so it alone showed). Three culprits in this codebase, all fixed by making visibility independent of JS:
+- App Router `template.tsx`: Framer Motion `initial opacity:0 → animate opacity:1` wrapper → replaced with a pure CSS keyframe (`.page-enter`, opacity only — no transform, which would break sticky scroll sections).
+- A scroll-reveal component (`Reveal`): was `useEffect`+IntersectionObserver+setTimeout toggling opacity → replaced with a pure CSS keyframe using `animation-fill-mode: both` (always settles at opacity:1). Became hook-free so `'use client'` was dropped; safe to import from both server and client components.
+- Framer Motion `AnimatePresence` panels (tabs / sticky scroll): the first/active panel's `initial={{opacity:0}}` is serialized into SSR HTML and only clears when JS animates. Fix: add `initial={false}` to `AnimatePresence` so the first panel renders at its `animate` (visible) state in SSR while transitions still animate.
 
-**Why:** content visibility must never depend on client JS finishing. Iframes/embeds can throttle or delay rAF-based animations.
+**Why:** content visibility must never depend on client JS finishing. Iframes/embeds can throttle or pause rAF/IntersectionObserver callbacks, leaving JS-gated opacity stuck at 0.
 
-**How to apply:** prefer a pure CSS keyframe animation (`animation: page-enter .35s both`) over JS-controlled opacity for any wrapper that gates visibility. CSS animations run without hydration and always settle at the final state; reduced-motion rules in globals.css collapse the duration. Same principle for scroll-reveal: always include a timed fallback that forces `shown=true`.
+**How to apply:** diagnose by `curl`-ing the page and counting inline `opacity:0` styles — every one is a JS-dependent visibility gate. Drive them to 0. Prefer CSS keyframes (`both` fill) over JS-toggled opacity; use `AnimatePresence initial={false}` for first-paint panels. Keep `animation-delay`/`transition-delay` zeroed in the `prefers-reduced-motion` block too, not just duration.
 
 ## Note: Three.js / WebGL errors are expected here
 `THREE.WebGLRenderer: ... could not create a WebGL context` logs in the dev container are harmless — no GPU. Components fall back to a static image; do not chase these when debugging blank pages.

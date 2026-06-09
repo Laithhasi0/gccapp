@@ -41,7 +41,7 @@ export function CaseStudiesTabs({ studies }: { studies: CaseStudy[] }) {
           ))}
         </div>
 
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={study.slug}
             initial={{ opacity: 0, y: 16 }}
