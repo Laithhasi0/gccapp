@@ -1,0 +1,1 @@
+- [Next.js blank in Replit iframe](nextjs-iframe-rendering.md) — X-Frame-Options header and JS-driven opacity:0 wrappers both make pages render blank/footer-only in the preview iframe.
