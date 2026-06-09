@@ -71,7 +71,7 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString:
-        process.env.DATABASE_URI || "postgres://localhost:5432/gccapp",
+        process.env.DATABASE_URI || process.env.DATABASE_URL || "postgres://localhost:5432/gccapp",
     },
   }),
   sharp,
