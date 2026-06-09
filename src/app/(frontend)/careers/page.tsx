@@ -3,6 +3,7 @@ import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
 import { CareerForm } from "@/components/forms/CareerForm";
+import { Editable } from "@/components/edit/Editable";
 import { MapPin, Briefcase } from "lucide-react";
 import { getCareers } from "@/lib/cms";
 
@@ -18,13 +19,14 @@ export default async function CareersPage() {
   const careers = await getCareers();
   return (
     <>
-      <Section>
-        <SectionHeading
-          eyebrow="Careers"
-          title="Build great products with great people"
-          description="We're a senior, close-knit team that values craft, ownership and balance."
-        />
-        <div className="mx-auto mt-14 max-w-3xl space-y-4">
+      <Editable href="/admin/collections/careers" label="Careers">
+        <Section>
+          <SectionHeading
+            eyebrow="Careers"
+            title="Build great products with great people"
+            description="We're a senior, close-knit team that values craft, ownership and balance."
+          />
+          <div className="mx-auto mt-14 max-w-3xl space-y-4">
           {careers.map((c, i) => (
             <Reveal key={c.slug} delay={i * 0.05}>
               <div className="hover-lift rounded-[var(--radius-lg)] border border-border bg-surface p-6 shadow-sm">
@@ -43,8 +45,9 @@ export default async function CareersPage() {
               </div>
             </Reveal>
           ))}
-        </div>
-      </Section>
+          </div>
+        </Section>
+      </Editable>
 
       <Section tone="surface">
         <div className="mx-auto max-w-2xl">

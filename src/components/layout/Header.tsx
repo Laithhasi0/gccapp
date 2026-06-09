@@ -8,6 +8,7 @@ import { Menu, X, Phone, ChevronDown, ArrowRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { EditPencil } from "@/components/edit/EditPencil";
 import { mainNav } from "@/content/site";
 import type { SiteSettings } from "@/lib/cms";
 import { cn } from "@/lib/utils";
@@ -41,6 +42,7 @@ export function Header({ settings }: { settings: SiteSettings }) {
         scrolled ? "border-b border-border shadow-sm" : "border-b border-transparent",
       )}
     >
+      <EditPencil href="/admin/globals/site-settings" label="Logo & menu" className="left-1/2 -translate-x-1/2 -bottom-3" />
       <Container className="flex h-16 items-center justify-between gap-4">
         <Link
           href="/"

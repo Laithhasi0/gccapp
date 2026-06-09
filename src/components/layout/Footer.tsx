@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SocialIcon } from "@/components/ui/SocialIcon";
+import { EditPencil } from "@/components/edit/EditPencil";
 import { mainNav } from "@/content/site";
 import { services } from "@/content/services";
 import type { SiteSettings } from "@/lib/cms";
@@ -9,6 +10,7 @@ import type { SiteSettings } from "@/lib/cms";
 export function Footer({ settings }: { settings: SiteSettings }) {
   return (
     <footer className="relative z-10 mt-auto border-t border-border bg-surface">
+      <EditPencil href="/admin/globals/site-settings" label="Footer" className="right-4 top-4" />
       <Container className="py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           {/* About */}

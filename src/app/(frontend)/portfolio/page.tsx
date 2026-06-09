@@ -3,6 +3,7 @@ import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { PortfolioGrid } from "@/components/sections/PortfolioGrid";
 import { CTASection } from "@/components/ui/CTASection";
+import { Editable } from "@/components/edit/Editable";
 import { getProjects, getProjectCategories } from "@/lib/cms";
 
 export const metadata: Metadata = {
@@ -26,20 +27,22 @@ export default async function PortfolioPage({
 
   return (
     <>
-      <Section>
-        <SectionHeading
-          eyebrow="Portfolio"
-          title="Work we're proud to share"
-          description="A selection of recent products across industries and platforms."
-        />
-        <div className="mt-12">
-          <PortfolioGrid
-            projects={projects}
-            categories={categories}
-            initialCategory={category ?? "All"}
+      <Editable href="/admin/collections/projects" label="Portfolio">
+        <Section>
+          <SectionHeading
+            eyebrow="Portfolio"
+            title="Work we're proud to share"
+            description="A selection of recent products across industries and platforms."
           />
-        </div>
-      </Section>
+          <div className="mt-12">
+            <PortfolioGrid
+              projects={projects}
+              categories={categories}
+              initialCategory={category ?? "All"}
+            />
+          </div>
+        </Section>
+      </Editable>
       <CTASection />
     </>
   );

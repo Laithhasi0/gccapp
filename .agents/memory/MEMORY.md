@@ -1,1 +1,2 @@
 - [Next.js blank in Replit iframe](nextjs-iframe-rendering.md) — X-Frame-Options header and JS-driven opacity:0 wrappers both make pages render blank/footer-only in the preview iframe.
+- [Payload media on Replit Object Storage](payload-replit-object-storage.md) — uploads vanish on Autoscale; needs custom GCS-SDK adapter (not S3), gated on OBJECT_STORAGE_ENABLED.

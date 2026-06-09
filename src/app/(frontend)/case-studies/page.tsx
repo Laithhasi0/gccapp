@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Badge } from "@/components/ui/Badge";
 import { Reveal } from "@/components/motion/Reveal";
 import { CTASection } from "@/components/ui/CTASection";
+import { Editable } from "@/components/edit/Editable";
 import { ArrowRight } from "lucide-react";
 import { getCaseStudies } from "@/lib/cms";
 
@@ -21,12 +22,13 @@ export default async function CaseStudiesPage() {
   const caseStudies = await getCaseStudies();
   return (
     <>
-      <Section>
-        <SectionHeading
-          eyebrow="Case studies"
-          title="How we deliver results"
-          description="Real problems, clear approaches and the outcomes that followed."
-        />
+      <Editable href="/admin/collections/case-studies" label="Case Studies">
+        <Section>
+          <SectionHeading
+            eyebrow="Case studies"
+            title="How we deliver results"
+            description="Real problems, clear approaches and the outcomes that followed."
+          />
         <div className="mt-14 space-y-8">
           {caseStudies.map((c, i) => (
             <Reveal key={c.slug} delay={i * 0.05}>
@@ -66,7 +68,8 @@ export default async function CaseStudiesPage() {
             </Reveal>
           ))}
         </div>
-      </Section>
+        </Section>
+      </Editable>
       <CTASection />
     </>
   );

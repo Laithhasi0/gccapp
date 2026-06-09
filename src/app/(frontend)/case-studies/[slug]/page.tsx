@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Reveal } from "@/components/motion/Reveal";
 import { CTASection } from "@/components/ui/CTASection";
+import { Editable } from "@/components/edit/Editable";
 import { ArrowLeft } from "lucide-react";
 import { getCaseStudy } from "@/lib/cms";
 
@@ -37,7 +38,7 @@ export default async function CaseStudyDetail({
   if (!study) notFound();
 
   return (
-    <>
+    <Editable href="/admin/collections/case-studies" label="this case study">
       <Section>
         <Link
           href="/case-studies"
@@ -89,6 +90,6 @@ export default async function CaseStudyDetail({
       </Section>
 
       <CTASection />
-    </>
+    </Editable>
   );
 }

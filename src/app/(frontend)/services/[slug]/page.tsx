@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 import { CTASection } from "@/components/ui/CTASection";
+import { Editable } from "@/components/edit/Editable";
 import { Check, ArrowLeft } from "lucide-react";
 import { getService } from "@/lib/cms";
 
@@ -38,7 +39,7 @@ export default async function ServiceDetail({
   const Icon = service.icon;
 
   return (
-    <>
+    <Editable href="/admin/collections/services" label="this service">
       <Section>
         <Link
           href="/services"
@@ -99,6 +100,6 @@ export default async function ServiceDetail({
       </Section>
 
       <CTASection />
-    </>
+    </Editable>
   );
 }

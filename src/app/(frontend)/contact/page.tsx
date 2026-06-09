@@ -3,6 +3,7 @@ import { Section } from "@/components/ui/Section";
 import { Badge } from "@/components/ui/Badge";
 import { Reveal } from "@/components/motion/Reveal";
 import { ContactForm } from "@/components/forms/ContactForm";
+import { Editable } from "@/components/edit/Editable";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { site } from "@/content/site";
 
@@ -21,8 +22,9 @@ const details = [
 
 export default function ContactPage() {
   return (
-    <Section>
-      <div className="grid gap-12 lg:grid-cols-5">
+    <Editable href="/admin/globals/site-settings" label="Contact details">
+      <Section>
+        <div className="grid gap-12 lg:grid-cols-5">
         <Reveal className="lg:col-span-2">
           <Badge>Contact</Badge>
           <h1 className="mt-5">Let&apos;s build something exceptional</h1>
@@ -64,7 +66,8 @@ export default function ContactPage() {
             <ContactForm />
           </div>
         </Reveal>
-      </div>
-    </Section>
+        </div>
+      </Section>
+    </Editable>
   );
 }

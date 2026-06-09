@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Reveal } from "@/components/motion/Reveal";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { CTASection } from "@/components/ui/CTASection";
+import { Editable } from "@/components/edit/Editable";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { getProjects, getProject } from "@/lib/cms";
 
@@ -49,7 +50,7 @@ export default async function ProjectDetail({
   ].filter((b) => b.body);
 
   return (
-    <>
+    <Editable href="/admin/collections/projects" label="this project">
       <Section>
         <Link
           href="/portfolio"
@@ -192,6 +193,6 @@ export default async function ProjectDetail({
       </Section>
 
       <CTASection />
-    </>
+    </Editable>
   );
 }
