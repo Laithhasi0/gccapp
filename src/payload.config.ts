@@ -6,6 +6,7 @@ import sharp from "sharp";
 import path from "path";
 import { fileURLToPath } from "url";
 import { replitObjectStorageAdapter } from "./lib/objectStorage";
+import { postgresStorageAdapter } from "./lib/postgresStorage";
 
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
@@ -24,9 +25,14 @@ import { Appearance } from "./globals/Appearance";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Flip on once an Object Storage bucket exists (workspace → Object Storage).
-// Until then, dev keeps using the on-disk staticDir in Media.ts.
+// Media persistence. On-disk uploads are wiped on every Autoscale redeploy, so we
+// always store uploads in durable storage instead. Default: the persistent Postgres
+// database (zero setup). Optional upgrade: set OBJECT_STORAGE_ENABLED=true after
+// creating an Object Storage bucket to store bytes in the bucket instead.
 const objectStorageEnabled = process.env.OBJECT_STORAGE_ENABLED === "true";
+const mediaAdapter = objectStorageEnabled
+  ? replitObjectStorageAdapter()
+  : postgresStorageAdapter();
 
 export default buildConfig({
   admin: {
@@ -61,19 +67,17 @@ export default buildConfig({
   },
   collections: [Services, Projects, CaseStudies, Faqs, Careers, Team, Media, Users],
   globals: [SiteSettings, HomeHero, HomeProcess, HomeCapabilities, HomeSections, Appearance],
-  plugins: objectStorageEnabled
-    ? [
-        cloudStoragePlugin({
-          collections: {
-            media: {
-              adapter: replitObjectStorageAdapter(),
-              disableLocalStorage: true,
-              prefix: "media",
-            },
-          },
-        }),
-      ]
-    : [],
+  plugins: [
+    cloudStoragePlugin({
+      collections: {
+        media: {
+          adapter: mediaAdapter,
+          disableLocalStorage: true,
+          prefix: "media",
+        },
+      },
+    }),
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "dev-secret-change-me",
   typescript: {

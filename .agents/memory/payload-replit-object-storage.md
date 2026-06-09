@@ -9,18 +9,26 @@ On Replit Autoscale deployments the filesystem is ephemeral and multi-instance, 
 Payload's default on-disk upload `staticDir` (`public/media/uploads`) loses every
 uploaded image on redeploy. Media must go to Object Storage to persist in production.
 
-**Why a custom adapter:** Replit Object Storage is GCS-based with its own SDK
-(`@replit/object-storage`), NOT S3-compatible — so `@payloadcms/storage-s3` does not
-work. We use `@payloadcms/plugin-cloud-storage` with a hand-written adapter
-(`src/lib/objectStorage.ts`) that uploads/downloads via the SDK `Client` and serves
-files through Payload's own `/api/<collection>/file/<filename>` route (bucket is private).
+**Default = Postgres blob storage (zero setup).** A bucket can ONLY be created via the
+workspace Object Storage UI (no agent tool; `.replit` edits blocked; the
+`javascript_object_storage` blueprint is not available in this env). To avoid blocking
+on that manual step, the default media adapter (`src/lib/postgresStorage.ts`) stores
+the (small, resized WebP) image bytes as BYTEA rows in the already-persistent
+Replit Postgres DB via `@payloadcms/plugin-cloud-storage`. Files serve through
+Payload's own `/api/<collection>/file/<filename>` route. `disableLocalStorage: true`,
+`prefix: "media"`. Verified roundtrip (upload→serve→404→delete) against the real DB.
 
-**How to apply:**
-- The plugin is only added when `OBJECT_STORAGE_ENABLED === "true"` (shared env var).
-  Without it, dev keeps using the local `staticDir` — so the app still boots with no bucket.
-- A bucket must be created manually via the workspace Object Storage tool (cannot be done
-  programmatically; `.replit` edits are blocked). The no-arg `new Client()` then uses the
-  repl's default bucket.
-- `downloadAsBytes` returns `Result<[Buffer]>` — the value is a one-element tuple, read `value[0]`.
-- After creating the bucket, set `OBJECT_STORAGE_ENABLED=true` and re-upload existing images
-  (old local-disk files are not migrated automatically).
+**Optional upgrade = Object Storage.** `src/lib/objectStorage.ts` is a GCS-SDK adapter
+(`@replit/object-storage`) — Replit OS is GCS-based, NOT S3-compatible, so
+`@payloadcms/storage-s3` does not work. It activates only when
+`OBJECT_STORAGE_ENABLED === "true"` (after a bucket exists). `downloadAsBytes` returns
+`Result<[Buffer]>` — a one-element tuple, read `value[0]`. `new Client()` uses the
+repl's default bucket.
+
+**Gotchas:**
+- Don't mark served files `Cache-Control: immutable` — a re-upload can replace bytes
+  under the same filename; use a moderate `max-age` so revalidation can happen.
+- The pg `Pool` in postgresStorage.ts is SEPARATE from Payload's DB pool; keep it small
+  (`max: 2`, `idleTimeoutMillis`, `allowExitOnIdle`) so Autoscale multi-instance doesn't
+  exhaust DB connections.
+- Switching adapters does not migrate existing files between backends.
