@@ -1,4 +1,4 @@
-modules = ["nodejs-20"]
+modules = ["nodejs-20", "postgresql-16"]
 [agent]
 expertMode = true
 stack = "BEST_EFFORT_FALLBACK"
@@ -9,7 +9,7 @@ channel = "stable-25_05"
 [userenv]
 
 [userenv.shared]
-PAYLOAD_SECRET = "replit-dev-payload-secret-2024"
+PAYLOAD_SECRET = "gcc-xjwm5ndh-8nu78fbg-nc0ws54w-xe4anvr3"
 
 [workflows]
 runButton = "Project"
