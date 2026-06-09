@@ -20,6 +20,13 @@ function url(m: MediaDoc | string | null | undefined, size: string): string | un
   return m.sizes?.[size]?.url || m.url || undefined;
 }
 
+/** Original (un-cropped) media URL — use for portrait/non-16:9 images like app screens. */
+function originalUrl(m: MediaDoc | string | null | undefined): string | undefined {
+  if (!m) return undefined;
+  if (typeof m === "string") return m;
+  return m.url || undefined;
+}
+
 /* ------------------------------- services -------------------------------- */
 
 type ServiceDoc = {
@@ -77,9 +84,13 @@ type ProjectDoc = {
   year: number;
   cover?: MediaDoc | string | null;
   excerpt: string;
+  overview?: string | null;
   challenge?: string | null;
   solution?: string | null;
   result?: string | null;
+  features?: { feature: string }[] | null;
+  techStack?: { tech: string }[] | null;
+  gallery?: { image?: MediaDoc | string | null }[] | null;
   tags?: { tag: string }[] | null;
 };
 
@@ -92,9 +103,15 @@ function mapProject(doc: ProjectDoc): Project {
     year: doc.year,
     cover: url(doc.cover, "wide") ?? "",
     excerpt: doc.excerpt,
+    overview: doc.overview ?? "",
     challenge: doc.challenge ?? "",
     solution: doc.solution ?? "",
     result: doc.result ?? "",
+    features: (doc.features ?? []).map((f) => f.feature),
+    techStack: (doc.techStack ?? []).map((t) => t.tech),
+    gallery: (doc.gallery ?? [])
+      .map((g) => originalUrl(g.image) ?? "")
+      .filter(Boolean),
     tags: (doc.tags ?? []).map((t) => t.tag),
   };
 }

@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { Section } from "@/components/ui/Section";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Badge } from "@/components/ui/Badge";
 import { Reveal } from "@/components/motion/Reveal";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { CTASection } from "@/components/ui/CTASection";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { getProjects, getProject } from "@/lib/cms";
 
 export const dynamic = "force-dynamic";
@@ -39,11 +41,12 @@ export default async function ProjectDetail({
   const index = projects.findIndex((p) => p.slug === slug);
   const next = projects[(index + 1) % projects.length];
 
+  const stack = project.techStack?.length ? project.techStack : project.tags;
   const blocks: { label: string; body: string }[] = [
     { label: "Challenge", body: project.challenge },
     { label: "Solution", body: project.solution },
     { label: "Result", body: project.result },
-  ];
+  ].filter((b) => b.body);
 
   return (
     <>
@@ -68,10 +71,8 @@ export default async function ProjectDetail({
               <dd className="mt-0.5 font-medium text-ink">{project.year}</dd>
             </div>
             <div>
-              <dt className="text-muted">Stack</dt>
-              <dd className="mt-0.5 font-medium text-ink">
-                {project.tags.join(" · ")}
-              </dd>
+              <dt className="text-muted">Category</dt>
+              <dd className="mt-0.5 font-medium text-ink">{project.category}</dd>
             </div>
           </dl>
         </Reveal>
@@ -87,16 +88,95 @@ export default async function ProjectDetail({
         </Reveal>
       </Section>
 
-      <Section tone="surface">
-        <div className="grid gap-10 lg:grid-cols-3">
-          {blocks.map((b, i) => (
-            <Reveal key={b.label} delay={i * 0.06}>
-              <h3 className="text-lg text-accent">{b.label}</h3>
-              <p className="mt-3 text-ink/90">{b.body}</p>
-            </Reveal>
-          ))}
-        </div>
-      </Section>
+      {(project.overview || project.features?.length || stack?.length) && (
+        <Section tone="surface">
+          <div className="grid gap-12 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              {project.overview && (
+                <Reveal>
+                  <h2 className="text-2xl">Overview</h2>
+                  <p className="mt-4 whitespace-pre-line text-lg text-ink/90">
+                    {project.overview}
+                  </p>
+                </Reveal>
+              )}
+              {project.features && project.features.length > 0 && (
+                <Reveal delay={0.05} className="mt-10">
+                  <h3 className="text-lg text-accent">Key features</h3>
+                  <ul className="mt-5 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+                    {project.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2.5">
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent">
+                          <Check className="h-3.5 w-3.5" />
+                        </span>
+                        <span className="text-sm text-ink/90">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </Reveal>
+              )}
+            </div>
+
+            {stack && stack.length > 0 && (
+              <Reveal delay={0.1}>
+                <aside className="rounded-[var(--radius-lg)] border border-border bg-background p-6 shadow-sm lg:sticky lg:top-24">
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-muted">
+                    Built with
+                  </h3>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {stack.map((tech) => (
+                      <span
+                        key={tech}
+                        className="rounded-full bg-accent-soft px-3 py-1.5 text-xs font-medium text-accent"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </aside>
+              </Reveal>
+            )}
+          </div>
+        </Section>
+      )}
+
+      {project.gallery && project.gallery.length > 0 && (
+        <Section>
+          <SectionHeading
+            eyebrow="Inside the app"
+            title="A look at the experience"
+            description="Key screens from the product, designed for clarity and speed."
+          />
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {project.gallery.map((src, i) => (
+              <Reveal key={src} delay={i * 0.06}>
+                <div className="relative aspect-[1/2] overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface shadow-sm">
+                  <Image
+                    src={src}
+                    alt={`${project.title} — screen ${i + 1}`}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {blocks.length > 0 && (
+        <Section tone="surface">
+          <div className="grid gap-10 lg:grid-cols-3">
+            {blocks.map((b, i) => (
+              <Reveal key={b.label} delay={i * 0.06}>
+                <h3 className="text-lg text-accent">{b.label}</h3>
+                <p className="mt-3 text-ink/90">{b.body}</p>
+              </Reveal>
+            ))}
+          </div>
+        </Section>
+      )}
 
       <Section>
         <Link

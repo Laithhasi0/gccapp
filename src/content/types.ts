@@ -32,10 +32,18 @@ export type Project = {
   year: number;
   cover: string;
   excerpt: string;
+  /** Long-form overview paragraph(s) describing the product. */
+  overview?: string;
   challenge: string;
   solution: string;
   result: string;
   tags: string[];
+  /** Headline product capabilities. */
+  features?: string[];
+  /** Technologies used to build the product. */
+  techStack?: string[];
+  /** Additional showcase images (app screens, mockups). */
+  gallery?: string[];
 };
 
 export type CaseStudy = {
