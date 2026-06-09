@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useReducedMotion,
-} from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import type { Project } from "@/content/types";
@@ -82,31 +79,53 @@ function Panels({ projects }: { projects: Project[] }) {
   );
 }
 
+/**
+ * Horizontal "selected work" reel. The section pins to the viewport while the
+ * track scrolls sideways, driven by GSAP ScrollTrigger (which is wired to Lenis
+ * smooth scrolling in SmoothScroll.tsx). On touch / reduced-motion it degrades
+ * to a normal horizontal swipe carousel.
+ */
 export function HorizontalShowcase({ projects }: { projects: Project[] }) {
   const section = useRef<HTMLElement>(null);
+  const pin = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
-  const [distance, setDistance] = useState(0);
   const reduce = useReducedMotion();
 
-  const { scrollYProgress } = useScroll({
-    target: section,
-    offset: ["start start", "end end"],
-  });
-  const x = useTransform(scrollYProgress, [0, 1], [0, -distance]);
-
   useEffect(() => {
-    const measure = () => {
-      const t = track.current;
-      if (t) setDistance(Math.max(0, t.scrollWidth - window.innerWidth + 24));
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    const id = window.setTimeout(measure, 700);
+    if (reduce) return;
+    const sectionEl = section.current;
+    const trackEl = track.current;
+    if (!sectionEl || !trackEl) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const distance = () =>
+      Math.max(0, trackEl.scrollWidth - window.innerWidth + 32);
+
+    const ctx = gsap.context(() => {
+      gsap.to(trackEl, {
+        x: () => -distance(),
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionEl,
+          start: "top top",
+          end: () => `+=${distance()}`,
+          pin: pin.current,
+          scrub: 1,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+    }, section);
+
+    // Recompute once images/fonts settle so the travel distance is accurate.
+    const t = window.setTimeout(() => ScrollTrigger.refresh(), 600);
+
     return () => {
-      window.removeEventListener("resize", measure);
-      window.clearTimeout(id);
+      window.clearTimeout(t);
+      ctx.revert();
     };
-  }, []);
+  }, [reduce, projects.length]);
 
   const Heading = (
     <Container className="shrink-0">
@@ -119,6 +138,7 @@ export function HorizontalShowcase({ projects }: { projects: Project[] }) {
     </Container>
   );
 
+  // Reduced motion: a plain swipeable carousel — always fully reachable.
   if (reduce) {
     return (
       <section id="work" className="bg-surface-tint py-16 sm:py-20">
@@ -131,21 +151,18 @@ export function HorizontalShowcase({ projects }: { projects: Project[] }) {
   }
 
   return (
-    <section
-      id="work"
-      ref={section}
-      className="relative bg-surface-tint"
-      style={{ height: `calc(100vh + ${distance}px)` }}
-    >
-      <div className="sticky top-0 flex h-screen flex-col justify-center gap-8 overflow-hidden pt-16">
+    <section id="work" ref={section} className="relative bg-surface-tint">
+      <div
+        ref={pin}
+        className="flex h-screen flex-col justify-center gap-8 overflow-hidden pt-16"
+      >
         {Heading}
-        <motion.div
+        <div
           ref={track}
-          style={{ x }}
           className="flex gap-6 px-5 will-change-transform sm:px-6 lg:px-8"
         >
           <Panels projects={projects} />
-        </motion.div>
+        </div>
       </div>
     </section>
   );

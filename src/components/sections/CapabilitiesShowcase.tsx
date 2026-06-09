@@ -1,17 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  AnimatePresence,
-  motion,
-  useScroll,
-  useTransform,
-  useMotionValueEvent,
-  useReducedMotion,
-} from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Container } from "@/components/ui/Container";
 
 type Cap = {
@@ -60,6 +55,13 @@ function Capability({ cap, index, total }: { cap: Cap; index: number; total: num
   );
 }
 
+/**
+ * "What we do" showcase. The section pins to the viewport and steps through each
+ * capability as you scroll, driven by GSAP ScrollTrigger (wired to Lenis smooth
+ * scroll in SmoothScroll.tsx). The active panel cross-fades; a progress bar is
+ * updated imperatively via a ref to avoid a React re-render on every frame. On
+ * reduced-motion it degrades to a simple stacked list.
+ */
 export function CapabilitiesShowcase({
   eyebrow = "What we do",
   items,
@@ -69,22 +71,49 @@ export function CapabilitiesShowcase({
 }) {
   const caps = items;
   const section = useRef<HTMLElement>(null);
+  const pin = useRef<HTMLDivElement>(null);
+  const bar = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
 
-  const { scrollYProgress } = useScroll({
-    target: section,
-    offset: ["start start", "end end"],
-  });
-  const barScaleX = useTransform(scrollYProgress, [0, 1], [1 / caps.length, 1]);
+  useEffect(() => {
+    if (reduce) return;
+    const sectionEl = section.current;
+    if (!sectionEl || caps.length === 0) return;
 
-  // Derive the active panel from scroll — only one panel is ever rendered.
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    const idx = Math.min(caps.length - 1, Math.max(0, Math.floor(v * caps.length)));
-    setActive(idx);
-  });
+    gsap.registerPlugin(ScrollTrigger);
 
-  // Reduced motion → simple stacked sections.
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: sectionEl,
+        start: "top top",
+        end: () => `+=${caps.length * window.innerHeight}`,
+        pin: pin.current,
+        scrub: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const idx = Math.min(
+            caps.length - 1,
+            Math.floor(self.progress * caps.length),
+          );
+          setActive((prev) => (prev === idx ? prev : idx));
+          if (bar.current) {
+            bar.current.style.transform = `scaleX(${Math.max(0.04, self.progress)})`;
+          }
+        },
+      });
+    }, section);
+
+    const t = window.setTimeout(() => ScrollTrigger.refresh(), 600);
+
+    return () => {
+      window.clearTimeout(t);
+      ctx.revert();
+    };
+  }, [reduce, caps.length]);
+
+  // Reduced motion → simple stacked sections, always fully visible.
   if (reduce) {
     return (
       <section id="explore" className="bg-surface py-16 sm:py-20">
@@ -104,13 +133,11 @@ export function CapabilitiesShowcase({
   }
 
   return (
-    <section
-      id="explore"
-      ref={section}
-      className="relative"
-      style={{ height: `${caps.length * 90}vh` }}
-    >
-      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden border-y border-border bg-gradient-to-b from-background via-surface to-background">
+    <section id="explore" ref={section} className="relative">
+      <div
+        ref={pin}
+        className="flex h-screen flex-col justify-center overflow-hidden border-y border-border bg-gradient-to-b from-background via-surface to-background"
+      >
         <Container className="pointer-events-none absolute inset-x-0 top-20 z-10">
           <span className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">
             {eyebrow}
@@ -145,9 +172,10 @@ export function CapabilitiesShowcase({
             ))}
           </div>
           <div className="h-[3px] w-full overflow-hidden rounded-full bg-border">
-            <motion.div
-              style={{ scaleX: barScaleX }}
+            <div
+              ref={bar}
               className="h-full origin-left rounded-full bg-gradient-to-r from-accent to-accent-hover"
+              style={{ transform: "scaleX(0.04)" }}
             />
           </div>
         </Container>

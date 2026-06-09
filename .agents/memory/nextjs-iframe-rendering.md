@@ -24,3 +24,10 @@ Any element rendered with `opacity:0` that relies on client JS to become visible
 
 ## Note: Three.js / WebGL errors are expected here
 `THREE.WebGLRenderer: ... could not create a WebGL context` logs in the dev container are harmless — no GPU. Components fall back to a static image; do not chase these when debugging blank pages.
+
+## 3. Scroll-jacking sections must use GSAP ScrollTrigger, not Framer Motion useScroll
+This app's smooth scrolling is Lenis wired to GSAP ScrollTrigger in `SmoothScroll.tsx` (`lenis.on('scroll', ScrollTrigger.update)` + gsap.ticker driving `lenis.raf`). Any pin / horizontal-scroll / scroll-progress section must be built on GSAP ScrollTrigger so it reads the same scroll source. Sections that instead used Framer Motion `useScroll` + CSS `sticky` desynced from Lenis and the pin/horizontal-scroll misbehaved.
+
+**Why:** two independent scroll engines (Lenis-smoothed position vs Framer's own measurement) drift apart; the visual effect lags or jumps.
+
+**How to apply:** use `gsap.context()` scoped to a section ref with `ScrollTrigger.create/gsap.to({ pin: <innerRef>, scrub, end: () => '+=' + dynamicDistance(), invalidateOnRefresh: true })`; return `ctx.revert()` from the effect (handles React Strict Mode double-mount). For scroll→state mapping, guard `setActive` to only fire on index change and mutate progress bars imperatively via a ref to avoid per-frame re-renders. Call `ScrollTrigger.refresh()` ~600ms after mount so image/font layout shifts get correct measured distances. Keep a `useReducedMotion()` fallback that renders a plain (non-pinned) layout.
