@@ -9,7 +9,10 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
+import { EditPencil } from "@/components/edit/EditPencil";
+import { useEditMode, useEditReady } from "@/components/edit/EditProvider";
 import type { Project } from "@/content/types";
+import type { Heading } from "@/lib/cms";
 
 function ProjectPanel({ project }: { project: Project }) {
   return (
@@ -85,14 +88,19 @@ function Panels({ projects }: { projects: Project[] }) {
  * smooth scrolling in SmoothScroll.tsx). On touch / reduced-motion it degrades
  * to a normal horizontal swipe carousel.
  */
-export function HorizontalShowcase({ projects }: { projects: Project[] }) {
+export function HorizontalShowcase({ projects, heading }: { projects: Project[]; heading?: Heading }) {
   const section = useRef<HTMLElement>(null);
   const pin = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+  const edit = useEditMode();
+  const ready = useEditReady();
+  // In edit mode, render the static carousel so click-to-edit overlays don't
+  // fight GSAP's DOM manipulation.
+  const reduce = useReducedMotion() || edit;
 
   useEffect(() => {
-    if (reduce) return;
+    // Wait until edit mode is resolved so GSAP never inits then tears down.
+    if (!ready || reduce) return;
     const sectionEl = section.current;
     const trackEl = track.current;
     if (!sectionEl || !trackEl) return;
@@ -125,15 +133,15 @@ export function HorizontalShowcase({ projects }: { projects: Project[] }) {
       window.clearTimeout(t);
       ctx.revert();
     };
-  }, [reduce, projects.length]);
+  }, [ready, reduce, projects.length]);
 
   const Heading = (
     <Container className="shrink-0">
       <span className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">
-        Selected work
+        {heading?.eyebrow ?? "Selected work"}
       </span>
       <h2 className="mt-2 max-w-2xl">
-        Projects we&apos;re <span className="text-gradient">proud of</span>
+        {heading?.title ?? "Projects we're proud of"}
       </h2>
     </Container>
   );
@@ -141,7 +149,8 @@ export function HorizontalShowcase({ projects }: { projects: Project[] }) {
   // Reduced motion: a plain swipeable carousel — always fully reachable.
   if (reduce) {
     return (
-      <section id="work" className="bg-surface-tint py-16 sm:py-20">
+      <section id="work" className="relative bg-surface-tint py-16 sm:py-20">
+        <EditPencil href="/admin/globals/home-sections" label="Selected work" />
         {Heading}
         <div className="mt-8 flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 pb-4 sm:px-6 lg:px-8">
           <Panels projects={projects} />

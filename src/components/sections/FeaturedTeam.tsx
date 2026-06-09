@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/Button";
 import { TeamCard } from "@/components/ui/TeamCard";
 import { Reveal } from "@/components/motion/Reveal";
 import { getFeaturedTeam } from "@/lib/getTeam";
+import type { Heading } from "@/lib/cms";
 
 /** Home-page variant: featured people + "Meet the team" link. */
-export async function FeaturedTeam() {
+export async function FeaturedTeam({ heading }: { heading?: Heading }) {
   const members = await getFeaturedTeam(4);
   if (!members.length) return null;
 
@@ -14,9 +15,9 @@ export async function FeaturedTeam() {
     <section className="py-16 sm:py-20 lg:py-28">
       <Container>
         <SectionHeading
-          eyebrow="Our people"
-          title="The team behind the work"
-          description="A senior, close-knit team of designers, engineers and strategists."
+          eyebrow={heading?.eyebrow ?? "Our people"}
+          title={heading?.title ?? "The team behind the work"}
+          description={heading?.description ?? "A senior, close-knit team of designers, engineers and strategists."}
         />
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {members.map((member, i) => (

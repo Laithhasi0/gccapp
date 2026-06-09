@@ -10,6 +10,8 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { Reveal } from "@/components/motion/Reveal";
+import { Editable } from "@/components/edit/Editable";
+import { EditPencil } from "@/components/edit/EditPencil";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { site } from "@/content/site";
 import {
@@ -17,31 +19,48 @@ import {
   getHero,
   getCapabilities,
   getCaseStudies,
+  getHomeSections,
 } from "@/lib/cms";
 
 // Renders CMS content at request time (updates with no redeploy).
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [projects, hero, capabilities, caseStudies] = await Promise.all([
+  const [projects, hero, capabilities, caseStudies, hs] = await Promise.all([
     getProjects(),
     getHero(),
     getCapabilities(),
     getCaseStudies(),
+    getHomeSections(),
   ]);
   return (
     <>
-      <Hero initialData={hero} />
+      <Editable href="/admin/globals/home-hero" label="Hero">
+        <Hero initialData={hero} />
+      </Editable>
       <CapabilitiesShowcase eyebrow={capabilities.eyebrow} items={capabilities.items} />
-      <ServicesGrid />
-      <Process />
-      <CaseStudiesTabs studies={caseStudies} />
-      <HorizontalShowcase projects={projects} />
-      <FeaturedTeam />
-      <CTASection />
+      <Editable href="/admin/globals/home-sections" label="Services">
+        <ServicesGrid heading={hs.services} />
+      </Editable>
+      <Editable href="/admin/globals/home-process" label="Process">
+        <Process />
+      </Editable>
+      <CaseStudiesTabs studies={caseStudies} heading={hs.caseStudies} />
+      <HorizontalShowcase projects={projects} heading={hs.selectedWork} />
+      <Editable href="/admin/collections/team" label="Team">
+        <FeaturedTeam heading={hs.team} />
+      </Editable>
+      <Editable href="/admin/globals/home-sections" label="Call to action">
+        <CTASection
+          title={hs.cta.title}
+          description={hs.cta.description}
+          primary={{ label: hs.cta.buttonLabel, href: hs.cta.buttonHref }}
+        />
+      </Editable>
 
       {/* Contact teaser */}
-      <section className="bg-surface-tint py-16 sm:py-20 lg:py-28">
+      <section className="relative bg-surface-tint py-16 sm:py-20 lg:py-28">
+        <EditPencil href="/admin/globals/site-settings" label="Contact" />
         <Container>
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <Reveal>

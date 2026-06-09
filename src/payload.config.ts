@@ -17,6 +17,7 @@ import { SiteSettings } from "./globals/SiteSettings";
 import { HomeHero } from "./globals/HomeHero";
 import { HomeProcess } from "./globals/HomeProcess";
 import { HomeCapabilities } from "./globals/HomeCapabilities";
+import { HomeSections } from "./globals/HomeSections";
 import { Appearance } from "./globals/Appearance";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -44,17 +45,16 @@ export default buildConfig({
         return base; // globals preview the home page
       },
       collections: ["services", "projects", "case-studies", "faqs", "careers", "team"],
-      globals: ["site-settings", "home-hero", "home-process", "home-capabilities", "appearance"],
+      globals: ["site-settings", "home-hero", "home-process", "home-capabilities", "home-sections", "appearance"],
       breakpoints: [
         { label: "Mobile", name: "mobile", width: 390, height: 844 },
         { label: "Tablet", name: "tablet", width: 768, height: 1024 },
         { label: "Desktop", name: "desktop", width: 1440, height: 900 },
-        { label: "Responsive", name: "responsive", width: 1280, height: 800 },
       ],
     },
   },
   collections: [Services, Projects, CaseStudies, Faqs, Careers, Team, Media, Users],
-  globals: [SiteSettings, HomeHero, HomeProcess, HomeCapabilities, Appearance],
+  globals: [SiteSettings, HomeHero, HomeProcess, HomeCapabilities, HomeSections, Appearance],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "dev-secret-change-me",
   typescript: {

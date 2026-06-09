@@ -7,21 +7,24 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { EditPencil } from "@/components/edit/EditPencil";
 import type { CaseStudy } from "@/content/types";
+import type { Heading } from "@/lib/cms";
 
-export function CaseStudiesTabs({ studies }: { studies: CaseStudy[] }) {
+export function CaseStudiesTabs({ studies, heading }: { studies: CaseStudy[]; heading?: Heading }) {
   const [active, setActive] = useState(0);
   const caseStudies = studies;
   const study = caseStudies[active];
   if (!study) return null;
 
   return (
-    <section className="bg-surface py-16 sm:py-20 lg:py-28">
+    <section className="relative bg-surface py-16 sm:py-20 lg:py-28">
+      <EditPencil href="/admin/globals/home-sections" label="Case studies" />
       <Container>
         <SectionHeading
-          eyebrow="Case studies"
-          title="Results that speak for themselves"
-          description="A closer look at how we approach real problems — and the outcomes we deliver."
+          eyebrow={heading?.eyebrow ?? "Case studies"}
+          title={heading?.title ?? "Results that speak for themselves"}
+          description={heading?.description ?? "A closer look at how we approach real problems — and the outcomes we deliver."}
         />
 
         <div className="mt-12 flex flex-wrap justify-center gap-2">

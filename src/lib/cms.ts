@@ -323,6 +323,67 @@ export async function getProcess(): Promise<ProcessData> {
   };
 }
 
+export type Heading = { eyebrow: string; title: string; description?: string };
+export type HomeSectionsData = {
+  services: Heading;
+  selectedWork: Heading;
+  caseStudies: Heading;
+  team: Heading;
+  stats: { value: string; label: string }[];
+  cta: { title: string; description: string; buttonLabel: string; buttonHref: string };
+};
+
+const seedHomeSections: HomeSectionsData = {
+  services: {
+    eyebrow: "What we do",
+    title: "Services built around outcomes",
+    description: "From first idea to launch and growth, we cover the full digital product lifecycle.",
+  },
+  selectedWork: { eyebrow: "Selected work", title: "Projects we're proud of" },
+  caseStudies: {
+    eyebrow: "Case studies",
+    title: "Results that speak for themselves",
+    description: "A closer look at how we approach real problems — and the outcomes we deliver.",
+  },
+  team: {
+    eyebrow: "Our people",
+    title: "The people behind the work",
+    description: "A close-knit team of designers, engineers and strategists.",
+  },
+  stats: seedStats.map((s) => ({ value: `${s.prefix ?? ""}${s.value}${s.suffix ?? ""}`, label: s.label })),
+  cta: {
+    title: "Ready to start your project?",
+    description:
+      "Let's build something your customers will love. Tell us about your idea and we'll take it from there.",
+    buttonLabel: "Start a project",
+    buttonHref: "/contact",
+  },
+};
+
+export async function getHomeSections(): Promise<HomeSectionsData> {
+  const g = await findGlobal<Record<string, unknown>>("home-sections");
+  if (!g) return seedHomeSections;
+  const heading = (v: unknown, fb: Heading): Heading => {
+    const h = (v as Partial<Heading>) || {};
+    return { eyebrow: h.eyebrow || fb.eyebrow, title: h.title || fb.title, description: h.description ?? fb.description };
+  };
+  const stats = (g.stats as { value: string; label: string }[]) || [];
+  const cta = (g.cta as Partial<HomeSectionsData["cta"]>) || {};
+  return {
+    services: heading(g.services, seedHomeSections.services),
+    selectedWork: heading(g.selectedWork, seedHomeSections.selectedWork),
+    caseStudies: heading(g.caseStudies, seedHomeSections.caseStudies),
+    team: heading(g.team, seedHomeSections.team),
+    stats: stats.length ? stats : seedHomeSections.stats,
+    cta: {
+      title: cta.title || seedHomeSections.cta.title,
+      description: cta.description || seedHomeSections.cta.description,
+      buttonLabel: cta.buttonLabel || seedHomeSections.cta.buttonLabel,
+      buttonHref: cta.buttonHref || seedHomeSections.cta.buttonHref,
+    },
+  };
+}
+
 export type CapabilityItem = {
   image: string;
   eyebrow: string;

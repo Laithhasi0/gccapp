@@ -8,6 +8,8 @@ import { ArrowRight } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Container } from "@/components/ui/Container";
+import { EditPencil } from "@/components/edit/EditPencil";
+import { useEditMode, useEditReady } from "@/components/edit/EditProvider";
 
 type Cap = {
   image: string;
@@ -73,11 +75,16 @@ export function CapabilitiesShowcase({
   const section = useRef<HTMLElement>(null);
   const pin = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+  const edit = useEditMode();
+  const ready = useEditReady();
+  // In edit mode, render the static (un-pinned) layout so click-to-edit
+  // overlays don't fight GSAP's DOM manipulation.
+  const reduce = useReducedMotion() || edit;
   const [active, setActive] = useState(0);
 
   useEffect(() => {
-    if (reduce) return;
+    // Wait until edit mode is resolved so GSAP never inits then tears down.
+    if (!ready || reduce) return;
     const sectionEl = section.current;
     if (!sectionEl || caps.length === 0) return;
 
@@ -111,12 +118,13 @@ export function CapabilitiesShowcase({
       window.clearTimeout(t);
       ctx.revert();
     };
-  }, [reduce, caps.length]);
+  }, [ready, reduce, caps.length]);
 
-  // Reduced motion → simple stacked sections, always fully visible.
+  // Reduced motion / edit mode → simple stacked sections, always fully visible.
   if (reduce) {
     return (
-      <section id="explore" className="bg-surface py-16 sm:py-20">
+      <section id="explore" className="relative bg-surface py-16 sm:py-20">
+        <EditPencil href="/admin/globals/home-capabilities" label="What we do" />
         <Container>
           <span className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">
             {eyebrow}

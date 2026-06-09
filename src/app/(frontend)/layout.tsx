@@ -8,6 +8,7 @@ import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { AnimatedBackground } from "@/components/motion/AnimatedBackground";
 import { LiveAppearance } from "@/components/motion/LiveAppearance";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
+import { EditProvider } from "@/components/edit/EditProvider";
 import { OrganizationJsonLd } from "@/components/JsonLd";
 import { getSiteSettings, getAppearance } from "@/lib/cms";
 import { site } from "@/content/site";
@@ -94,11 +95,13 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
-        <Header settings={settings} />
-        <main id="main" className="relative z-10 flex-1">
-          {children}
-        </main>
-        <Footer settings={settings} />
+        <EditProvider>
+          <Header settings={settings} />
+          <main id="main" className="relative z-10 flex-1">
+            {children}
+          </main>
+          <Footer settings={settings} />
+        </EditProvider>
         <ScrollToTop />
       </body>
     </html>

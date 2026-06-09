@@ -8,8 +8,10 @@ import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { Stats } from "@/components/sections/Stats";
 import { TeamGrid } from "@/components/sections/TeamGrid";
 import { CTASection } from "@/components/ui/CTASection";
+import { Editable } from "@/components/edit/Editable";
 import { Check } from "lucide-react";
 import { getTeam } from "@/lib/getTeam";
+import { getHomeSections } from "@/lib/cms";
 
 // Reads team from the CMS at request time so new people appear without a redeploy.
 export const dynamic = "force-dynamic";
@@ -28,7 +30,7 @@ const whyUs = [
 ];
 
 export default async function AboutPage() {
-  const team = await getTeam();
+  const [team, hs] = await Promise.all([getTeam(), getHomeSections()]);
   return (
     <>
       <Section>
@@ -59,7 +61,9 @@ export default async function AboutPage() {
         </div>
       </Section>
 
-      <Stats />
+      <Editable href="/admin/globals/home-sections" label="Stats">
+        <Stats items={hs.stats} />
+      </Editable>
 
       <Section tone="surface">
         <div className="grid gap-12 lg:grid-cols-2">
