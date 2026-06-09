@@ -49,7 +49,7 @@ export default async function AboutPage() {
           </Reveal>
           <Reveal delay={0.1}>
             <ParallaxImage
-              src="/media/images/09-about-lifestyle.png"
+              src="/media/images/09-about-lifestyle.webp"
               alt="The GCC App team collaborating in a bright modern office"
               priority
               className="aspect-[16/10] rounded-[var(--radius-lg)] border border-border shadow-sm"

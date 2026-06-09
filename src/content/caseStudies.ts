@@ -7,7 +7,7 @@ export const caseStudies: CaseStudy[] = [
     category: "Development",
     summary:
       "How a headless rebuild cut load times in half and lifted conversion by a third.",
-    cover: "/media/images/10-portfolio-ecommerce.png",
+    cover: "/media/images/10-portfolio-ecommerce.webp",
     metrics: [
       { label: "Faster page loads", value: "2.1×" },
       { label: "Conversion uplift", value: "+34%" },
@@ -34,7 +34,7 @@ export const caseStudies: CaseStudy[] = [
     category: "CRM",
     summary:
       "Replacing spreadsheets with a real-time operations dashboard for a logistics network.",
-    cover: "/media/images/13-portfolio-dashboard-crm.png",
+    cover: "/media/images/13-portfolio-dashboard-crm.webp",
     metrics: [
       { label: "Faster dispatch", value: "−40%" },
       { label: "Teams unified", value: "6" },
@@ -61,7 +61,7 @@ export const caseStudies: CaseStudy[] = [
     category: "Web Design",
     summary:
       "A calm redesign that doubled self-service adoption for a retail bank.",
-    cover: "/media/images/12-portfolio-mobile-ios.png",
+    cover: "/media/images/12-portfolio-mobile-ios.webp",
     metrics: [
       { label: "App Store rating", value: "4.7★" },
       { label: "Self-service growth", value: "+52%" },

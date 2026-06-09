@@ -205,7 +205,7 @@ export async function getHero(): Promise<HeroData> {
       "We build powerful mobile applications, web applications and modern websites that help businesses grow and succeed in the digital world.",
     primaryCta: { label: p.label || "Get Started", href: p.href || "/contact" },
     secondaryCta: { label: s.label || "View Portfolio", href: s.href || "/portfolio" },
-    posterImage: url(g?.posterImage as MediaDoc, "wide") || "/media/images/15-og-share-card.png",
+    posterImage: url(g?.posterImage as MediaDoc, "wide") || "/media/images/15-og-share-card.webp",
     backgroundVideoUrl: (g?.backgroundVideoUrl as string) || "/media/video/hero-background-loop.mp4",
     showStats: g?.showStats !== false,
     stats: stats.length
@@ -315,10 +315,10 @@ export type CapabilityItem = {
 };
 
 const seedCapabilities: CapabilityItem[] = [
-  { image: "/media/images/cap-design.png", eyebrow: "Design & Brand", title: "Crafted with clarity", text: "Identity systems and interfaces designed around real people — clean, modern and effortless to use.", href: "/services/branding" },
-  { image: "/media/images/cap-web.png", eyebrow: "Web & Mobile", title: "Built to last", text: "Fast, robust web and mobile apps engineered on modern frameworks, with quality and accessibility baked in.", href: "/services/web-design" },
-  { image: "/media/images/cap-commerce.png", eyebrow: "Commerce & Product", title: "Made to scale", text: "Storefronts and digital products that load fast, convert well and grow with your business.", href: "/services/e-commerce" },
-  { image: "/media/images/cap-growth.png", eyebrow: "Marketing & Growth", title: "Made to grow", text: "Performance marketing and SEO that earn attention and compound into durable, measurable growth.", href: "/services/digital-marketing" },
+  { image: "/media/images/cap-design.webp", eyebrow: "Design & Brand", title: "Crafted with clarity", text: "Identity systems and interfaces designed around real people — clean, modern and effortless to use.", href: "/services/branding" },
+  { image: "/media/images/cap-web.webp", eyebrow: "Web & Mobile", title: "Built to last", text: "Fast, robust web and mobile apps engineered on modern frameworks, with quality and accessibility baked in.", href: "/services/web-design" },
+  { image: "/media/images/cap-commerce.webp", eyebrow: "Commerce & Product", title: "Made to scale", text: "Storefronts and digital products that load fast, convert well and grow with your business.", href: "/services/e-commerce" },
+  { image: "/media/images/cap-growth.webp", eyebrow: "Marketing & Growth", title: "Made to grow", text: "Performance marketing and SEO that earn attention and compound into durable, measurable growth.", href: "/services/digital-marketing" },
 ];
 
 export async function getCapabilities(): Promise<{ eyebrow: string; items: CapabilityItem[] }> {

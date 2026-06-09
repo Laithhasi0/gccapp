@@ -18,7 +18,7 @@ export const services: Service[] = [
     title: "Mobile App Development",
     icon: Smartphone,
     excerpt: "High-performance mobile applications for iOS and Android.",
-    image: "/media/images/03-service-mobile-app.png",
+    image: "/media/images/03-service-mobile-app.webp",
     body: [
       "We design and build mobile products end to end — from the first prototype to App Store and Google Play launch, and the iteration that follows.",
       "Our team builds scalable, secure and user-friendly apps tailored to the unique needs of your business.",
@@ -36,7 +36,7 @@ export const services: Service[] = [
     title: "Web Design & Development",
     icon: Globe,
     excerpt: "Modern, responsive websites optimized for all devices.",
-    image: "/media/images/04-service-web-design.png",
+    image: "/media/images/04-service-web-design.webp",
     body: [
       "We craft modern, responsive websites and web applications that look great and perform on every device.",
       "Every build is fast, accessible and easy for your team to maintain.",
@@ -54,7 +54,7 @@ export const services: Service[] = [
     title: "E-Commerce Development",
     icon: ShoppingCart,
     excerpt: "Online stores built to sell your products effectively.",
-    image: "/media/images/05-service-ecommerce.png",
+    image: "/media/images/05-service-ecommerce.webp",
     body: [
       "We build online stores engineered to convert — fast, secure and easy to manage.",
       "From catalogue to checkout, we obsess over the details that move revenue.",
@@ -72,7 +72,7 @@ export const services: Service[] = [
     title: "Branding",
     icon: Palette,
     excerpt: "Build a strong, memorable identity for your business.",
-    image: "/media/images/06-service-branding.png",
+    image: "/media/images/06-service-branding.webp",
     body: [
       "We build brand identities that scale across every surface — logo, type, colour, voice and the components that bring them to life.",
       "The result is a memorable identity your whole team can use confidently.",
@@ -90,7 +90,7 @@ export const services: Service[] = [
     title: "Digital Marketing",
     icon: Megaphone,
     excerpt: "Targeted strategies to grow your audience and reach.",
-    image: "/media/images/07-service-digital-marketing.png",
+    image: "/media/images/07-service-digital-marketing.webp",
     body: [
       "We plan and run campaigns that earn attention and revenue across paid, organic and lifecycle channels.",
       "Clear reporting at every step, optimised toward the numbers that matter.",
@@ -108,7 +108,7 @@ export const services: Service[] = [
     title: "SEO",
     icon: Search,
     excerpt: "Improve search rankings and increase organic traffic.",
-    image: "/media/images/08-service-seo.png",
+    image: "/media/images/08-service-seo.webp",
     body: [
       "We improve search visibility the durable way — technical health, content that answers real intent, and authority that compounds.",
       "Every engagement starts with an audit and a prioritised roadmap.",
@@ -126,7 +126,7 @@ export const services: Service[] = [
     title: "IT Support",
     icon: Server,
     excerpt: "Reliable system maintenance and technical assistance.",
-    image: "/media/images/14-portfolio-cloud-infra.png",
+    image: "/media/images/14-portfolio-cloud-infra.webp",
     body: [
       "We keep your systems running smoothly with proactive maintenance and responsive technical support.",
       "From infrastructure to day-to-day issues, we've got you covered.",
@@ -144,7 +144,7 @@ export const services: Service[] = [
     title: "CRM Solutions",
     icon: Users,
     excerpt: "Organize customer data and track sales performance.",
-    image: "/media/images/13-portfolio-dashboard-crm.png",
+    image: "/media/images/13-portfolio-dashboard-crm.webp",
     body: [
       "We build and integrate CRM solutions that centralise your customer data and give you a single source of truth.",
       "Track sales performance, automate workflows and grow relationships.",
@@ -162,7 +162,7 @@ export const services: Service[] = [
     title: "WooCommerce",
     icon: ShoppingBag,
     excerpt: "Professional WooCommerce store setup and management.",
-    image: "/media/images/10-portfolio-ecommerce.png",
+    image: "/media/images/10-portfolio-ecommerce.webp",
     body: [
       "We set up, customise and manage professional WooCommerce stores on WordPress.",
       "Themes, plugins, payments and performance — handled end to end.",
@@ -180,7 +180,7 @@ export const services: Service[] = [
     title: "UI/UX Design",
     icon: PenTool,
     excerpt: "User-focused interface and experience design.",
-    image: "/media/images/cap-design.png",
+    image: "/media/images/cap-design.webp",
     body: [
       "We design clear, user-focused interfaces and experiences that feel effortless to use.",
       "Research, wireframes, prototypes and polished UI — grounded in real user journeys.",

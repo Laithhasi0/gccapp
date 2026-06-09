@@ -7,7 +7,7 @@ export const projects: Project[] = [
     category: "E-Commerce",
     client: "Retail client",
     year: 2025,
-    cover: "/media/images/10-portfolio-ecommerce.png",
+    cover: "/media/images/10-portfolio-ecommerce.webp",
     excerpt: "A complete online store platform built to sell products effectively.",
     challenge:
       "The client needed a fast, scalable online store that was easy to manage and ready to grow with their catalogue.",
@@ -23,7 +23,7 @@ export const projects: Project[] = [
     category: "Web App",
     client: "Technology client",
     year: 2025,
-    cover: "/media/images/14-portfolio-cloud-infra.png",
+    cover: "/media/images/14-portfolio-cloud-infra.webp",
     excerpt: "Software-as-a-service integration connecting tools, data and workflows.",
     challenge:
       "Disconnected tools and data made day-to-day operations slow and error-prone.",
@@ -39,7 +39,7 @@ export const projects: Project[] = [
     category: "Mobile",
     client: "Confidential client",
     year: 2025,
-    cover: "/media/images/12-portfolio-mobile-ios.png",
+    cover: "/media/images/12-portfolio-mobile-ios.webp",
     excerpt: "A cross-platform mobile experience for iOS and Android.",
     challenge:
       "The client wanted a single, high-quality mobile experience across both app stores.",
@@ -55,7 +55,7 @@ export const projects: Project[] = [
     category: "Web App",
     client: "Confidential client",
     year: 2024,
-    cover: "/media/images/showcase-engineering.png",
+    cover: "/media/images/showcase-engineering.webp",
     excerpt: "An immersive virtual-reality world experience.",
     challenge:
       "The brief called for an engaging, immersive 3D environment users could explore.",
@@ -71,7 +71,7 @@ export const projects: Project[] = [
     category: "Dashboard",
     client: "Operations client",
     year: 2024,
-    cover: "/media/images/13-portfolio-dashboard-crm.png",
+    cover: "/media/images/13-portfolio-dashboard-crm.webp",
     excerpt: "A custom CRM to organise customer data and track sales performance.",
     challenge:
       "Customer data lived across spreadsheets with no single view of the pipeline.",
@@ -87,7 +87,7 @@ export const projects: Project[] = [
     category: "Mobile",
     client: "Confidential client",
     year: 2024,
-    cover: "/media/images/03-service-mobile-app.png",
+    cover: "/media/images/03-service-mobile-app.webp",
     excerpt: "A wrist app designed to boost everyday productivity.",
     challenge:
       "Users needed quick, glanceable productivity tools on their wrist.",

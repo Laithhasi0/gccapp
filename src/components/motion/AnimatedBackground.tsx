@@ -11,7 +11,7 @@ export function AnimatedBackground() {
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
       {/* Circuit-board imagery — detail at the edges, dark in the middle */}
       <Image
-        src="/media/images/tech-bg-wide.png"
+        src="/media/images/tech-bg-wide.webp"
         alt=""
         fill
         priority
@@ -19,7 +19,7 @@ export function AnimatedBackground() {
         className="hidden object-cover opacity-60 md:block"
       />
       <Image
-        src="/media/images/tech-bg-tall.png"
+        src="/media/images/tech-bg-tall.webp"
         alt=""
         fill
         sizes="100vw"
