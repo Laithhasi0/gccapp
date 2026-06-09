@@ -1,0 +1,198 @@
+import {
+  Smartphone,
+  Globe,
+  ShoppingCart,
+  Palette,
+  Megaphone,
+  Search,
+  Server,
+  Users,
+  ShoppingBag,
+  PenTool,
+} from "lucide-react";
+import type { Service } from "./types";
+
+export const services: Service[] = [
+  {
+    slug: "mobile-app",
+    title: "Mobile App Development",
+    icon: Smartphone,
+    excerpt: "High-performance mobile applications for iOS and Android.",
+    image: "/media/images/03-service-mobile-app.png",
+    body: [
+      "We design and build mobile products end to end — from the first prototype to App Store and Google Play launch, and the iteration that follows.",
+      "Our team builds scalable, secure and user-friendly apps tailored to the unique needs of your business.",
+    ],
+    features: [
+      "iOS & Android development",
+      "Scalable, secure architecture",
+      "App Store & Play Store launch",
+      "Ongoing support and updates",
+    ],
+    seoDescription: "High-performance iOS and Android mobile app development by GCC App.",
+  },
+  {
+    slug: "web-design",
+    title: "Web Design & Development",
+    icon: Globe,
+    excerpt: "Modern, responsive websites optimized for all devices.",
+    image: "/media/images/04-service-web-design.png",
+    body: [
+      "We craft modern, responsive websites and web applications that look great and perform on every device.",
+      "Every build is fast, accessible and easy for your team to maintain.",
+    ],
+    features: [
+      "Responsive, mobile-first design",
+      "Fast and accessible builds",
+      "Modern frameworks",
+      "Easy to maintain",
+    ],
+    seoDescription: "Modern, responsive web design and development by GCC App.",
+  },
+  {
+    slug: "e-commerce",
+    title: "E-Commerce Development",
+    icon: ShoppingCart,
+    excerpt: "Online stores built to sell your products effectively.",
+    image: "/media/images/05-service-ecommerce.png",
+    body: [
+      "We build online stores engineered to convert — fast, secure and easy to manage.",
+      "From catalogue to checkout, we obsess over the details that move revenue.",
+    ],
+    features: [
+      "Custom & platform storefronts",
+      "Conversion-focused checkout",
+      "Payments & shipping",
+      "Inventory management",
+    ],
+    seoDescription: "E-commerce development and online stores by GCC App.",
+  },
+  {
+    slug: "branding",
+    title: "Branding",
+    icon: Palette,
+    excerpt: "Build a strong, memorable identity for your business.",
+    image: "/media/images/06-service-branding.png",
+    body: [
+      "We build brand identities that scale across every surface — logo, type, colour, voice and the components that bring them to life.",
+      "The result is a memorable identity your whole team can use confidently.",
+    ],
+    features: [
+      "Logo & identity systems",
+      "Brand guidelines",
+      "Voice & messaging",
+      "Collateral & templates",
+    ],
+    seoDescription: "Brand identity and design systems by GCC App.",
+  },
+  {
+    slug: "digital-marketing",
+    title: "Digital Marketing",
+    icon: Megaphone,
+    excerpt: "Targeted strategies to grow your audience and reach.",
+    image: "/media/images/07-service-digital-marketing.png",
+    body: [
+      "We plan and run campaigns that earn attention and revenue across paid, organic and lifecycle channels.",
+      "Clear reporting at every step, optimised toward the numbers that matter.",
+    ],
+    features: [
+      "Paid social & search",
+      "Content & lifecycle",
+      "Analytics & reporting",
+      "Audience growth",
+    ],
+    seoDescription: "Performance digital marketing by GCC App.",
+  },
+  {
+    slug: "seo",
+    title: "SEO",
+    icon: Search,
+    excerpt: "Improve search rankings and increase organic traffic.",
+    image: "/media/images/08-service-seo.png",
+    body: [
+      "We improve search visibility the durable way — technical health, content that answers real intent, and authority that compounds.",
+      "Every engagement starts with an audit and a prioritised roadmap.",
+    ],
+    features: [
+      "Technical SEO audits",
+      "Content & on-page",
+      "Site speed & architecture",
+      "Rank tracking & reporting",
+    ],
+    seoDescription: "SEO and organic growth services by GCC App.",
+  },
+  {
+    slug: "it-support",
+    title: "IT Support",
+    icon: Server,
+    excerpt: "Reliable system maintenance and technical assistance.",
+    image: "/media/images/14-portfolio-cloud-infra.png",
+    body: [
+      "We keep your systems running smoothly with proactive maintenance and responsive technical support.",
+      "From infrastructure to day-to-day issues, we've got you covered.",
+    ],
+    features: [
+      "Proactive maintenance",
+      "Responsive support",
+      "Infrastructure & cloud",
+      "Monitoring & uptime",
+    ],
+    seoDescription: "Reliable IT support and system maintenance by GCC App.",
+  },
+  {
+    slug: "crm",
+    title: "CRM Solutions",
+    icon: Users,
+    excerpt: "Organize customer data and track sales performance.",
+    image: "/media/images/13-portfolio-dashboard-crm.png",
+    body: [
+      "We build and integrate CRM solutions that centralise your customer data and give you a single source of truth.",
+      "Track sales performance, automate workflows and grow relationships.",
+    ],
+    features: [
+      "Custom CRM builds",
+      "Sales pipeline tracking",
+      "Automation & workflows",
+      "Integrations & reporting",
+    ],
+    seoDescription: "Custom CRM solutions and integrations by GCC App.",
+  },
+  {
+    slug: "woocommerce",
+    title: "WooCommerce",
+    icon: ShoppingBag,
+    excerpt: "Professional WooCommerce store setup and management.",
+    image: "/media/images/10-portfolio-ecommerce.png",
+    body: [
+      "We set up, customise and manage professional WooCommerce stores on WordPress.",
+      "Themes, plugins, payments and performance — handled end to end.",
+    ],
+    features: [
+      "Store setup & theming",
+      "Plugins & extensions",
+      "Payments & shipping",
+      "Maintenance & support",
+    ],
+    seoDescription: "Professional WooCommerce setup and management by GCC App.",
+  },
+  {
+    slug: "ui-ux",
+    title: "UI/UX Design",
+    icon: PenTool,
+    excerpt: "User-focused interface and experience design.",
+    image: "/media/images/cap-design.png",
+    body: [
+      "We design clear, user-focused interfaces and experiences that feel effortless to use.",
+      "Research, wireframes, prototypes and polished UI — grounded in real user journeys.",
+    ],
+    features: [
+      "UX research & flows",
+      "Wireframes & prototypes",
+      "Polished UI design",
+      "Design systems",
+    ],
+    seoDescription: "User-focused UI/UX design by GCC App.",
+  },
+];
+
+export const getService = (slug: string) => services.find((s) => s.slug === slug);

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod +x media/generate_all.sh)",
+      "Bash(bash media/generate_all.sh)",
+      "Bash(mkdir -p public/media/images public/media/video public/media/svg)",
+      "Bash(cp media/generated/*.png public/media/images/)",
+      "Bash(cp media/video/*.mp4 public/media/video/)",
+      "Bash(cp media/svg/*.svg public/media/svg/)",
+      "Bash(node -e \"const p=require\\('./node_modules/lucide-react/package.json'\\); console.log\\('lucide-react', p.version\\)\")",
+      "Bash(node -e \"const l=require\\('lucide-react'\\); console.log\\(['Smartphone','Globe','ShoppingCart','Palette','Megaphone','Search','Linkedin','Instagram','Twitter','Github','ArrowRight','Check','Menu','X','Plus','Minus'].map\\(n=>n+':'+\\(typeof l[n]!=='undefined'\\)\\).join\\(' '\\)\\)\")",
+      "Bash(curl -s -o /dev/null -w \"home:%{http_code}\\\\n\" http://localhost:3000/)"
+    ]
+  }
+}
