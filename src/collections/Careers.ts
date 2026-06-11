@@ -22,8 +22,8 @@ export const Careers: CollectionConfig = {
     {
       type: "row",
       fields: [
-        { name: "location", type: "text", required: true },
-        { name: "type", type: "text", required: true, admin: { description: "e.g. Full-time" } },
+        { name: "location", type: "text", required: true, localized: true },
+        { name: "type", type: "text", required: true, localized: true, admin: { description: "e.g. Full-time" } },
       ],
     },
     { name: "description", type: "textarea", required: true, localized: true },

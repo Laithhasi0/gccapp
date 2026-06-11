@@ -28,7 +28,7 @@ export const HomeHero: GlobalConfig = {
         {
           type: "row",
           fields: [
-            { name: "label", type: "text", defaultValue: "Get Started" },
+            { name: "label", type: "text", localized: true, defaultValue: "Get Started" },
             { name: "href", type: "text", defaultValue: "/contact" },
           ],
         },
@@ -41,7 +41,7 @@ export const HomeHero: GlobalConfig = {
         {
           type: "row",
           fields: [
-            { name: "label", type: "text", defaultValue: "View Portfolio" },
+            { name: "label", type: "text", localized: true, defaultValue: "View Portfolio" },
             { name: "href", type: "text", defaultValue: "/portfolio" },
           ],
         },

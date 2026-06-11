@@ -42,7 +42,7 @@ export const SiteSettings: GlobalConfig = {
           type: "text",
           admin: { description: 'Tel link, e.g. tel:+19387407555' },
         },
-        { name: "address", type: "text" },
+        { name: "address", type: "text", localized: true },
       ],
     },
     {

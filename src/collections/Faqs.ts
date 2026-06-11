@@ -22,6 +22,7 @@ export const Faqs: CollectionConfig = {
           name: "category",
           type: "text",
           required: true,
+          localized: true,
           admin: { description: "Groups FAQs, e.g. Pricing, Process." },
         },
         { name: "order", type: "number", defaultValue: 0 },
