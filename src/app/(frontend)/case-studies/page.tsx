@@ -9,6 +9,8 @@ import { CTASection } from "@/components/ui/CTASection";
 import { Editable } from "@/components/edit/Editable";
 import { ArrowRight } from "lucide-react";
 import { getCaseStudies } from "@/lib/cms";
+import { getLocale } from "@/lib/getLocale";
+import { getUI } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Case Studies",
@@ -20,14 +22,15 @@ export const dynamic = "force-dynamic";
 
 export default async function CaseStudiesPage() {
   const caseStudies = await getCaseStudies();
+  const t = getUI(await getLocale());
   return (
     <>
       <Editable href="/admin/collections/case-studies" label="Case Studies">
         <Section>
           <SectionHeading
-            eyebrow="Case studies"
-            title="How we deliver results"
-            description="Real problems, clear approaches and the outcomes that followed."
+            eyebrow={t.pages.caseStudies.eyebrow}
+            title={t.pages.caseStudies.listTitle}
+            description={t.pages.caseStudies.listDescription}
           />
         <div className="mt-14 space-y-8">
           {caseStudies.map((c, i) => (
@@ -46,7 +49,7 @@ export default async function CaseStudiesPage() {
                   />
                 </div>
                 <div>
-                  <Badge>{c.category}</Badge>
+                  <Badge>{t.categories[c.category] ?? c.category}</Badge>
                   <h3 className="mt-3 text-2xl group-hover:text-accent">{c.title}</h3>
                   <p className="mt-3">{c.summary}</p>
                   <div className="mt-6 flex flex-wrap gap-x-10 gap-y-3">
@@ -60,7 +63,7 @@ export default async function CaseStudiesPage() {
                     ))}
                   </div>
                   <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-accent">
-                    Read case study
+                    {t.buttons.readCaseStudy}
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </div>

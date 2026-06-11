@@ -3,11 +3,15 @@ import { Mail, Phone, MapPin } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SocialIcon } from "@/components/ui/SocialIcon";
 import { EditPencil } from "@/components/edit/EditPencil";
-import { mainNav } from "@/content/site";
-import { services } from "@/content/services";
+import { getServices } from "@/lib/cms";
 import type { SiteSettings } from "@/lib/cms";
+import { getLocale } from "@/lib/getLocale";
+import { getUI, type NavItem } from "@/lib/i18n";
 
-export function Footer({ settings }: { settings: SiteSettings }) {
+export async function Footer({ settings, nav }: { settings: SiteSettings; nav: NavItem[] }) {
+  const locale = await getLocale();
+  const t = getUI(locale);
+  const services = await getServices();
   return (
     <footer className="relative z-10 mt-auto border-t border-border bg-surface">
       <EditPencil href="/admin/globals/site-settings" label="Footer" className="right-4 top-4" />
@@ -40,10 +44,10 @@ export function Footer({ settings }: { settings: SiteSettings }) {
 
           {/* Quick links */}
           <div>
-            <h4 className="text-sm font-semibold text-ink">Company</h4>
+            <h4 className="text-sm font-semibold text-ink">{t.footer.company}</h4>
             <ul className="mt-4 space-y-2.5 text-sm">
-              {mainNav
-                .filter((n) => !n.children || n.label === "Services")
+              {nav
+                .filter((n) => !n.children || n.href === "/services")
                 .map((n) => (
                   <li key={n.href}>
                     <Link
@@ -56,7 +60,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
                 ))}
               <li>
                 <Link href="/careers" className="text-muted transition-colors hover:text-accent">
-                  Careers
+                  {t.footer.careers}
                 </Link>
               </li>
             </ul>
@@ -64,7 +68,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
 
           {/* Services */}
           <div>
-            <h4 className="text-sm font-semibold text-ink">Services</h4>
+            <h4 className="text-sm font-semibold text-ink">{t.footer.services}</h4>
             <ul className="mt-4 space-y-2.5 text-sm">
               {services.map((s) => (
                 <li key={s.slug}>
@@ -81,7 +85,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
 
           {/* Contact */}
           <div>
-            <h4 className="text-sm font-semibold text-ink">Get in touch</h4>
+            <h4 className="text-sm font-semibold text-ink">{t.footer.getInTouch}</h4>
             <ul className="mt-4 space-y-3 text-sm text-muted">
               <li className="flex items-center gap-2.5">
                 <Mail className="h-4 w-4 text-accent" />
@@ -105,14 +109,14 @@ export function Footer({ settings }: { settings: SiteSettings }) {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-sm text-muted sm:flex-row">
           <span>
-            © {new Date().getFullYear()} {settings.siteName}. All rights reserved.
+            © {new Date().getFullYear()} {settings.siteName}. {t.footer.rights}
           </span>
           <div className="flex gap-5">
             <Link href="/privacy" className="hover:text-accent">
-              Privacy
+              {t.footer.privacy}
             </Link>
             <Link href="/terms" className="hover:text-accent">
-              Terms
+              {t.footer.terms}
             </Link>
           </div>
         </div>

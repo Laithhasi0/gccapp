@@ -1,9 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { Project } from "@/content/types";
 
 export function ProjectCard({ project }: { project: Project }) {
+  const { t } = useI18n();
   return (
     <Link
       href={`/portfolio/${project.slug}`}
@@ -19,12 +23,12 @@ export function ProjectCard({ project }: { project: Project }) {
         />
         {/* Category badge */}
         <span className="absolute left-4 top-4 rounded-full bg-surface/90 px-3 py-1 text-xs font-medium text-accent backdrop-blur-sm">
-          {project.category}
+          {t.categories[project.category] ?? project.category}
         </span>
         {/* Hover overlay */}
         <div className="absolute inset-0 flex items-end bg-gradient-to-t from-ink/70 via-ink/10 to-transparent opacity-0 transition-opacity duration-[var(--dur)] ease-soft group-hover:opacity-100">
           <span className="m-4 inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-contrast">
-            View project
+            {t.buttons.viewProject}
             <ArrowUpRight className="h-4 w-4" />
           </span>
         </div>

@@ -10,6 +10,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Container } from "@/components/ui/Container";
 import { EditPencil } from "@/components/edit/EditPencil";
 import { useEditMode, useEditReady } from "@/components/edit/EditProvider";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 
 type Cap = {
   image: string;
@@ -20,6 +21,7 @@ type Cap = {
 };
 
 function Capability({ cap, index, total }: { cap: Cap; index: number; total: number }) {
+  const { t } = useI18n();
   return (
     <Container className="grid w-full items-center gap-8 lg:grid-cols-2 lg:gap-14">
       <div className="order-2 lg:order-1">
@@ -37,7 +39,7 @@ function Capability({ cap, index, total }: { cap: Cap; index: number; total: num
           href={cap.href}
           className="mt-7 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:underline"
         >
-          Explore the service
+          {t.buttons.exploreService}
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
@@ -71,6 +73,7 @@ export function CapabilitiesShowcase({
   eyebrow?: string;
   items: Cap[];
 }) {
+  const { t } = useI18n();
   const caps = items;
   const section = useRef<HTMLElement>(null);
   const pin = useRef<HTMLDivElement>(null);
@@ -129,7 +132,7 @@ export function CapabilitiesShowcase({
           <span className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">
             {eyebrow}
           </span>
-          <h2 className="mt-2">Everything you need, end to end</h2>
+          <h2 className="mt-2">{t.caps.headingFull}</h2>
         </Container>
         <div className="mt-12 space-y-16">
           {caps.map((c, i) => (

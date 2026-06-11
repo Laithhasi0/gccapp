@@ -5,6 +5,8 @@ import { PortfolioGrid } from "@/components/sections/PortfolioGrid";
 import { CTASection } from "@/components/ui/CTASection";
 import { Editable } from "@/components/edit/Editable";
 import { getProjects, getProjectCategories } from "@/lib/cms";
+import { getLocale } from "@/lib/getLocale";
+import { getUI } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Portfolio",
@@ -24,15 +26,16 @@ export default async function PortfolioPage({
     getProjects(),
     getProjectCategories(),
   ]);
+  const t = getUI(await getLocale());
 
   return (
     <>
       <Editable href="/admin/collections/projects" label="Portfolio">
         <Section>
           <SectionHeading
-            eyebrow="Portfolio"
-            title="Work we're proud to share"
-            description="A selection of recent products across industries and platforms."
+            eyebrow={t.pages.portfolio.eyebrow}
+            title={t.pages.portfolio.title}
+            description={t.pages.portfolio.description}
           />
           <div className="mt-12">
             <PortfolioGrid

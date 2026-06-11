@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ProjectCard } from "@/components/ui/ProjectCard";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { Project } from "@/content/types";
 
 export function PortfolioGrid({
@@ -13,6 +14,7 @@ export function PortfolioGrid({
   categories: string[];
   initialCategory?: string;
 }) {
+  const { t } = useI18n();
   const valid = categories.includes(initialCategory) ? initialCategory : "All";
   const [category, setCategory] = useState(valid);
 
@@ -36,7 +38,7 @@ export function PortfolioGrid({
                 : "bg-accent-soft text-accent hover:bg-accent-soft/70"
             }`}
           >
-            {c}
+            {c === "All" ? t.filter.all : (t.categories[c] ?? c)}
           </button>
         ))}
       </div>

@@ -10,6 +10,8 @@ import { CTASection } from "@/components/ui/CTASection";
 import { Editable } from "@/components/edit/Editable";
 import { Check, ArrowLeft } from "lucide-react";
 import { getService } from "@/lib/cms";
+import { getLocale } from "@/lib/getLocale";
+import { getUI } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +39,7 @@ export default async function ServiceDetail({
   if (!service) notFound();
 
   const Icon = service.icon;
+  const t = getUI(await getLocale());
 
   return (
     <Editable href="/admin/collections/services" label="this service">
@@ -45,18 +48,18 @@ export default async function ServiceDetail({
           href="/services"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-accent"
         >
-          <ArrowLeft className="h-4 w-4" /> All services
+          <ArrowLeft className="h-4 w-4" /> {t.pages.serviceDetail.allServices}
         </Link>
         <div className="mt-8 grid items-center gap-12 lg:grid-cols-2">
           <Reveal>
             <span className="inline-flex h-12 w-12 items-center justify-center rounded-[var(--radius-sm)] bg-accent-soft text-accent">
               <Icon className="h-6 w-6" strokeWidth={1.75} />
             </span>
-            <Badge className="ml-3 align-middle">Service</Badge>
+            <Badge className="ml-3 align-middle">{t.pages.serviceDetail.service}</Badge>
             <h1 className="mt-5">{service.title}</h1>
             <p className="mt-5 text-lg">{service.excerpt}</p>
             <div className="mt-7">
-              <Button href="/contact">Discuss your project</Button>
+              <Button href="/contact">{t.pages.serviceDetail.discussProject}</Button>
             </div>
           </Reveal>
           <Reveal delay={0.1}>
@@ -84,7 +87,7 @@ export default async function ServiceDetail({
             ))}
           </div>
           <div>
-            <h3 className="text-xl">What&apos;s included</h3>
+            <h3 className="text-xl">{t.pages.serviceDetail.whatsIncluded}</h3>
             <ul className="mt-5 space-y-3">
               {service.features.map((f) => (
                 <li key={f} className="flex items-start gap-3">

@@ -3,11 +3,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Label, Input, Textarea, Select } from "@/components/ui/Field";
-import { services } from "@/content/services";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 
 type Status = "idle" | "loading" | "success" | "error";
 
-export function ContactForm({ compact = false }: { compact?: boolean }) {
+export function ContactForm({
+  compact = false,
+  serviceOptions = [],
+}: {
+  compact?: boolean;
+  serviceOptions?: string[];
+}) {
+  const { t } = useI18n();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
 
@@ -34,29 +41,29 @@ export function ContactForm({ compact = false }: { compact?: boolean }) {
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || "Something went wrong. Please try again.");
+        throw new Error(body.error || t.form.errorGeneric);
       }
       setStatus("success");
       form.reset();
     } catch (err) {
       setStatus("error");
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : t.form.errorGeneric);
     }
   }
 
   if (status === "success") {
     return (
       <div className="rounded-[var(--radius)] border border-accent/30 bg-accent-soft p-6 text-center">
-        <p className="font-display text-lg font-semibold text-ink">Thank you!</p>
+        <p className="font-display text-lg font-semibold text-ink">{t.form.thankYou}</p>
         <p className="mt-1 text-sm text-muted">
-          We&apos;ve received your message and will reply within one business day.
+          {t.form.thankYouBody}
         </p>
         <button
           type="button"
           onClick={() => setStatus("idle")}
           className="mt-4 text-sm font-medium text-accent hover:underline"
         >
-          Send another message
+          {t.form.sendAnother}
         </button>
       </div>
     );
@@ -66,41 +73,41 @@ export function ContactForm({ compact = false }: { compact?: boolean }) {
     <form onSubmit={onSubmit} className="space-y-5" noValidate>
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" required autoComplete="name" placeholder="Your name" />
+          <Label htmlFor="name">{t.form.name}</Label>
+          <Input id="name" name="name" required autoComplete="name" placeholder={t.form.yourNamePh} />
         </div>
         <div>
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" required autoComplete="email" placeholder="you@company.com" />
+          <Label htmlFor="email">{t.form.email}</Label>
+          <Input id="email" name="email" type="email" required autoComplete="email" placeholder={t.form.emailCompanyPh} />
         </div>
       </div>
 
       {!compact && (
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <Label htmlFor="company">Company</Label>
-            <Input id="company" name="company" autoComplete="organization" placeholder="Company (optional)" />
+            <Label htmlFor="company">{t.form.company}</Label>
+            <Input id="company" name="company" autoComplete="organization" placeholder={t.form.companyPh} />
           </div>
           <div>
-            <Label htmlFor="service">Service of interest</Label>
+            <Label htmlFor="service">{t.form.serviceOfInterest}</Label>
             <Select id="service" name="service" defaultValue="">
               <option value="" disabled>
-                Select a service
+                {t.form.selectService}
               </option>
-              {services.map((s) => (
-                <option key={s.slug} value={s.title}>
-                  {s.title}
+              {serviceOptions.map((title) => (
+                <option key={title} value={title}>
+                  {title}
                 </option>
               ))}
-              <option value="Other">Other</option>
+              <option value="Other">{t.form.other}</option>
             </Select>
           </div>
         </div>
       )}
 
       <div>
-        <Label htmlFor="message">Message</Label>
-        <Textarea id="message" name="message" required placeholder="Tell us about your project…" />
+        <Label htmlFor="message">{t.form.message}</Label>
+        <Textarea id="message" name="message" required placeholder={t.form.messagePh} />
       </div>
 
       {/* Honeypot field — visually hidden */}
@@ -118,7 +125,7 @@ export function ContactForm({ compact = false }: { compact?: boolean }) {
       )}
 
       <Button type="submit" disabled={status === "loading"} className="w-full sm:w-auto">
-        {status === "loading" ? "Sending…" : "Send message"}
+        {status === "loading" ? t.form.sending : t.form.send}
       </Button>
     </form>
   );

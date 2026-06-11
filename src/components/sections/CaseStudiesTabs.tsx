@@ -8,10 +8,12 @@ import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { EditPencil } from "@/components/edit/EditPencil";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { CaseStudy } from "@/content/types";
 import type { Heading } from "@/lib/cms";
 
 export function CaseStudiesTabs({ studies, heading }: { studies: CaseStudy[]; heading?: Heading }) {
+  const { t } = useI18n();
   const [active, setActive] = useState(0);
   const caseStudies = studies;
   const study = caseStudies[active];
@@ -39,7 +41,7 @@ export function CaseStudiesTabs({ studies, heading }: { studies: CaseStudy[]; he
                   : "bg-accent-soft text-accent hover:bg-accent-soft/70"
               }`}
             >
-              {c.category}
+              {t.categories[c.category] ?? c.category}
             </button>
           ))}
         </div>
@@ -79,7 +81,7 @@ export function CaseStudiesTabs({ studies, heading }: { studies: CaseStudy[]; he
                 href={`/case-studies/${study.slug}`}
                 className="mt-7 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:underline"
               >
-                Read the case study
+                {t.buttons.readCaseStudy}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>

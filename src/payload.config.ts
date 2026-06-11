@@ -88,7 +88,7 @@ export default buildConfig({
       { label: "English", code: "en" },
       { label: "العربية", code: "ar" },
     ],
-    defaultLocale: "en",
+    defaultLocale: "ar",
     fallback: true,
   },
   db: postgresAdapter({

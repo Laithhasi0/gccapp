@@ -11,6 +11,8 @@ import { CTASection } from "@/components/ui/CTASection";
 import { Editable } from "@/components/edit/Editable";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { getProjects, getProject } from "@/lib/cms";
+import { getLocale } from "@/lib/getLocale";
+import { getUI } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -41,12 +43,13 @@ export default async function ProjectDetail({
 
   const index = projects.findIndex((p) => p.slug === slug);
   const next = projects[(index + 1) % projects.length];
+  const t = getUI(await getLocale());
 
   const stack = project.techStack?.length ? project.techStack : project.tags;
   const blocks: { label: string; body: string }[] = [
-    { label: "Challenge", body: project.challenge },
-    { label: "Solution", body: project.solution },
-    { label: "Result", body: project.result },
+    { label: t.pages.portfolio.challenge, body: project.challenge },
+    { label: t.pages.portfolio.solution, body: project.solution },
+    { label: t.pages.portfolio.result, body: project.result },
   ].filter((b) => b.body);
 
   return (
@@ -56,24 +59,24 @@ export default async function ProjectDetail({
           href="/portfolio"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-accent"
         >
-          <ArrowLeft className="h-4 w-4" /> All projects
+          <ArrowLeft className="h-4 w-4" /> {t.pages.portfolio.allProjects}
         </Link>
         <Reveal className="mt-8">
-          <Badge>{project.category}</Badge>
+          <Badge>{t.categories[project.category] ?? project.category}</Badge>
           <h1 className="mt-5 max-w-3xl">{project.title}</h1>
           <p className="mt-4 max-w-2xl text-lg">{project.excerpt}</p>
           <dl className="mt-8 flex flex-wrap gap-x-12 gap-y-4 text-sm">
             <div>
-              <dt className="text-muted">Client</dt>
+              <dt className="text-muted">{t.pages.portfolio.client}</dt>
               <dd className="mt-0.5 font-medium text-ink">{project.client}</dd>
             </div>
             <div>
-              <dt className="text-muted">Year</dt>
+              <dt className="text-muted">{t.pages.portfolio.year}</dt>
               <dd className="mt-0.5 font-medium text-ink">{project.year}</dd>
             </div>
             <div>
-              <dt className="text-muted">Category</dt>
-              <dd className="mt-0.5 font-medium text-ink">{project.category}</dd>
+              <dt className="text-muted">{t.pages.portfolio.category}</dt>
+              <dd className="mt-0.5 font-medium text-ink">{t.categories[project.category] ?? project.category}</dd>
             </div>
           </dl>
         </Reveal>
@@ -95,7 +98,7 @@ export default async function ProjectDetail({
             <div className="lg:col-span-2">
               {project.overview && (
                 <Reveal>
-                  <h2 className="text-2xl">Overview</h2>
+                  <h2 className="text-2xl">{t.pages.portfolio.overview}</h2>
                   <p className="mt-4 whitespace-pre-line text-lg text-ink/90">
                     {project.overview}
                   </p>
@@ -103,7 +106,7 @@ export default async function ProjectDetail({
               )}
               {project.features && project.features.length > 0 && (
                 <Reveal delay={0.05} className="mt-10">
-                  <h3 className="text-lg text-accent">Key features</h3>
+                  <h3 className="text-lg text-accent">{t.pages.portfolio.keyFeatures}</h3>
                   <ul className="mt-5 grid gap-x-8 gap-y-3 sm:grid-cols-2">
                     {project.features.map((f) => (
                       <li key={f} className="flex items-start gap-2.5">
@@ -122,7 +125,7 @@ export default async function ProjectDetail({
               <Reveal delay={0.1}>
                 <aside className="rounded-[var(--radius-lg)] border border-border bg-background p-6 shadow-sm lg:sticky lg:top-24">
                   <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-muted">
-                    Built with
+                    {t.pages.portfolio.builtWith}
                   </h3>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {stack.map((tech) => (
@@ -144,9 +147,9 @@ export default async function ProjectDetail({
       {project.gallery && project.gallery.length > 0 && (
         <Section>
           <SectionHeading
-            eyebrow="Inside the app"
-            title="A look at the experience"
-            description="Key screens from the product, designed for clarity and speed."
+            eyebrow={t.pages.portfolio.galleryEyebrow}
+            title={t.pages.portfolio.galleryTitle}
+            description={t.pages.portfolio.galleryDescription}
           />
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {project.gallery.map((src, i) => (
@@ -154,7 +157,7 @@ export default async function ProjectDetail({
                 <div className="relative aspect-[1/2] overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface shadow-sm">
                   <Image
                     src={src}
-                    alt={`${project.title} — screen ${i + 1}`}
+                    alt={`${project.title} — ${t.pages.portfolio.galleryScreen} ${i + 1}`}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover"
@@ -185,7 +188,7 @@ export default async function ProjectDetail({
           className="hover-lift group flex items-center justify-between gap-4 rounded-[var(--radius-lg)] border border-border bg-surface p-8 shadow-sm"
         >
           <div>
-            <span className="text-sm text-muted">Next project</span>
+            <span className="text-sm text-muted">{t.pages.portfolio.nextProject}</span>
             <h3 className="mt-1 text-xl group-hover:text-accent">{next.title}</h3>
           </div>
           <ArrowRight className="h-6 w-6 text-accent transition-transform group-hover:translate-x-1" />

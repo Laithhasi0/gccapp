@@ -14,6 +14,7 @@ export const SiteSettings: GlobalConfig = {
         {
           name: "availabilityText",
           type: "text",
+          localized: true,
           defaultValue: "Available for projects",
           admin: { description: "Small status shown in the header." },
         },
@@ -58,7 +59,7 @@ export const SiteSettings: GlobalConfig = {
         {
           type: "row",
           fields: [
-            { name: "label", type: "text", defaultValue: "Contact Us" },
+            { name: "label", type: "text", localized: true, defaultValue: "Contact Us" },
             { name: "href", type: "text", defaultValue: "/contact" },
           ],
         },

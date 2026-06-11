@@ -11,10 +11,12 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { EditPencil } from "@/components/edit/EditPencil";
 import { useEditMode, useEditReady } from "@/components/edit/EditProvider";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { Project } from "@/content/types";
 import type { Heading } from "@/lib/cms";
 
 function ProjectPanel({ project }: { project: Project }) {
+  const { t } = useI18n();
   return (
     <Link
       href={`/portfolio/${project.slug}`}
@@ -29,7 +31,7 @@ function ProjectPanel({ project }: { project: Project }) {
           className="object-cover transition-transform duration-700 ease-soft group-hover:scale-[1.05]"
         />
         <span className="absolute left-4 top-4">
-          <Badge className="glass">{project.category}</Badge>
+          <Badge className="glass">{t.categories[project.category] ?? project.category}</Badge>
         </span>
       </div>
       <div className="flex flex-1 flex-col p-6">
@@ -56,6 +58,7 @@ function ProjectPanel({ project }: { project: Project }) {
 }
 
 function EndPanel() {
+  const { t } = useI18n();
   return (
     <Link
       href="/portfolio"
@@ -65,7 +68,7 @@ function EndPanel() {
         <ArrowUpRight className="h-6 w-6" />
       </span>
       <span className="font-display text-lg font-semibold text-ink">
-        View all projects
+        {t.buttons.viewAllProjects}
       </span>
     </Link>
   );

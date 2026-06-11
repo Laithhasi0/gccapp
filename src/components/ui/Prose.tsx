@@ -5,11 +5,13 @@ type Block = { heading: string; body: string[] };
 export function LegalPage({
   title,
   updated,
+  updatedLabel = "Last updated",
   intro,
   blocks,
 }: {
   title: string;
   updated: string;
+  updatedLabel?: string;
   intro: string;
   blocks: Block[];
 }) {
@@ -17,7 +19,7 @@ export function LegalPage({
     <Section>
       <div className="mx-auto max-w-2xl">
         <h1>{title}</h1>
-        <p className="mt-3 text-sm text-muted">Last updated: {updated}</p>
+        <p className="mt-3 text-sm text-muted">{updatedLabel}: {updated}</p>
         <p className="mt-6 text-lg">{intro}</p>
         <div className="mt-10 space-y-8">
           {blocks.map((b) => (

@@ -1,9 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import { getLocale } from "@/lib/getLocale";
+import { getUI } from "@/lib/i18n";
 import type { Service } from "@/content/types";
 
-export function ServiceCard({ service }: { service: Service }) {
+export async function ServiceCard({ service }: { service: Service }) {
+  const t = getUI(await getLocale());
   const Icon = service.icon;
   return (
     <Link
@@ -30,7 +33,7 @@ export function ServiceCard({ service }: { service: Service }) {
         <h3 className="text-lg">{service.title}</h3>
         <p className="mt-2 flex-1 text-sm">{service.excerpt}</p>
         <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent">
-          Learn more
+          {t.buttons.learnMore}
           <ArrowRight className="h-4 w-4 transition-transform duration-[var(--dur-fast)] ease-soft group-hover:translate-x-1" />
         </span>
       </div>

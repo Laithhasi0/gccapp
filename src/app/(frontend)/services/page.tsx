@@ -6,6 +6,8 @@ import { Reveal } from "@/components/motion/Reveal";
 import { CTASection } from "@/components/ui/CTASection";
 import { Editable } from "@/components/edit/Editable";
 import { getServices } from "@/lib/cms";
+import { getLocale } from "@/lib/getLocale";
+import { getUI } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -18,14 +20,15 @@ export const dynamic = "force-dynamic";
 
 export default async function ServicesPage() {
   const services = await getServices();
+  const t = getUI(await getLocale());
   return (
     <>
       <Editable href="/admin/collections/services" label="Services">
         <Section>
           <SectionHeading
-            eyebrow="Services"
-            title="Everything you need to build and grow"
-            description="End-to-end digital solutions — from apps and websites to branding, marketing and support."
+            eyebrow={t.pages.services.eyebrow}
+            title={t.pages.services.title}
+            description={t.pages.services.description}
           />
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {services.map((service, i) => (

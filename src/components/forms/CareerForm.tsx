@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Label, Input, Textarea, Select } from "@/components/ui/Field";
-import { careers } from "@/content/careers";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 
 type Status = "idle" | "loading" | "success" | "error";
 
-export function CareerForm() {
+export function CareerForm({ roleOptions = [] }: { roleOptions?: string[] }) {
+  const { t } = useI18n();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
 
@@ -25,8 +26,8 @@ export function CareerForm() {
     const payload = {
       name: fd.get("name"),
       email: fd.get("email"),
-      service: `Career application: ${fd.get("role")}`,
-      message: `Applying for: ${fd.get("role")}\nLinkedIn/Portfolio: ${fd.get("link") || "—"}\n\n${fd.get("message")}`,
+      service: `${t.form.careerApplication}: ${fd.get("role")}`,
+      message: `${t.form.applyingFor}: ${fd.get("role")}\n${t.form.portfolioLinkedin}: ${fd.get("link") || "—"}\n\n${fd.get("message")}`,
       company_website: fd.get("company_website"),
     };
     try {
@@ -37,13 +38,13 @@ export function CareerForm() {
       });
       if (!res.ok) {
         const b = await res.json().catch(() => ({}));
-        throw new Error(b.error || "Something went wrong.");
+        throw new Error(b.error || t.form.errorGeneric);
       }
       setStatus("success");
       form.reset();
     } catch (err) {
       setStatus("error");
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : t.form.errorGeneric);
     }
   }
 
@@ -51,10 +52,10 @@ export function CareerForm() {
     return (
       <div className="rounded-[var(--radius)] border border-accent/30 bg-accent-soft p-6 text-center">
         <p className="font-display text-lg font-semibold text-ink">
-          Application received!
+          {t.form.applicationReceived}
         </p>
         <p className="mt-1 text-sm text-muted">
-          Thanks for applying. We&apos;ll be in touch if there&apos;s a fit.
+          {t.form.applicationReceivedBody}
         </p>
       </div>
     );
@@ -64,33 +65,33 @@ export function CareerForm() {
     <form onSubmit={onSubmit} className="space-y-5" noValidate>
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <Label htmlFor="c-name">Name</Label>
-          <Input id="c-name" name="name" required autoComplete="name" placeholder="Your name" />
+          <Label htmlFor="c-name">{t.form.name}</Label>
+          <Input id="c-name" name="name" required autoComplete="name" placeholder={t.form.yourNamePh} />
         </div>
         <div>
-          <Label htmlFor="c-email">Email</Label>
-          <Input id="c-email" name="email" type="email" required autoComplete="email" placeholder="you@email.com" />
+          <Label htmlFor="c-email">{t.form.email}</Label>
+          <Input id="c-email" name="email" type="email" required autoComplete="email" placeholder={t.form.emailPersonalPh} />
         </div>
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <Label htmlFor="c-role">Role</Label>
-          <Select id="c-role" name="role" defaultValue={careers[0].role}>
-            {careers.map((c) => (
-              <option key={c.slug} value={c.role}>
-                {c.role}
+          <Label htmlFor="c-role">{t.form.role}</Label>
+          <Select id="c-role" name="role" defaultValue={roleOptions[0] ?? ""}>
+            {roleOptions.map((role) => (
+              <option key={role} value={role}>
+                {role}
               </option>
             ))}
           </Select>
         </div>
         <div>
-          <Label htmlFor="c-link">Portfolio / LinkedIn</Label>
-          <Input id="c-link" name="link" placeholder="https://…" />
+          <Label htmlFor="c-link">{t.form.portfolioLinkedin}</Label>
+          <Input id="c-link" name="link" placeholder={t.form.linkPh} />
         </div>
       </div>
       <div>
-        <Label htmlFor="c-message">Why you?</Label>
-        <Textarea id="c-message" name="message" required placeholder="Tell us a little about yourself…" />
+        <Label htmlFor="c-message">{t.form.whyYou}</Label>
+        <Textarea id="c-message" name="message" required placeholder={t.form.whyYouPh} />
       </div>
       <div aria-hidden="true" className="absolute left-[-9999px]">
         <label>
@@ -104,7 +105,7 @@ export function CareerForm() {
         </p>
       )}
       <Button type="submit" disabled={status === "loading"} className="w-full sm:w-auto">
-        {status === "loading" ? "Sending…" : "Submit application"}
+        {status === "loading" ? t.form.sending : t.form.submitApplication}
       </Button>
     </form>
   );

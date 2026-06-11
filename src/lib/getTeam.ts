@@ -2,6 +2,8 @@ import "server-only";
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { teamData, byOrder, initialsOf } from "@/content/team";
+import { teamDataAr } from "@/content/ar";
+import { getLocale } from "./getLocale";
 import type { TeamMember, Department } from "@/content/types";
 
 type MediaDoc = {
@@ -61,6 +63,7 @@ function mapDoc(doc: TeamDoc): TeamMember {
 
 /** All team members from the CMS, sorted by `order`. Falls back to seed data. */
 export async function getTeam(): Promise<TeamMember[]> {
+  const locale = await getLocale();
   try {
     const payload = await getPayload({ config });
     const res = await payload.find({
@@ -68,13 +71,14 @@ export async function getTeam(): Promise<TeamMember[]> {
       sort: "order",
       depth: 1,
       limit: 100,
-      locale: "en",
+      locale,
     });
     if (res.docs.length) return (res.docs as unknown as TeamDoc[]).map(mapDoc);
   } catch {
     // DB unreachable (e.g. build with no database) — use seed data.
   }
-  return [...teamData].sort(byOrder);
+  const data = locale === "ar" ? teamDataAr : teamData;
+  return [...data].sort(byOrder);
 }
 
 /** Featured members for the home-page variant. */

@@ -12,6 +12,8 @@ import { Editable } from "@/components/edit/Editable";
 import { Check } from "lucide-react";
 import { getTeam } from "@/lib/getTeam";
 import { getHomeSections } from "@/lib/cms";
+import { getLocale } from "@/lib/getLocale";
+import { getUI } from "@/lib/i18n";
 
 // Reads team from the CMS at request time so new people appear without a redeploy.
 export const dynamic = "force-dynamic";
@@ -22,37 +24,28 @@ export const metadata: Metadata = {
     "GCC App is a premium digital agency in Riyadh building mobile apps, web apps, e-commerce, branding, marketing and SEO.",
 };
 
-const whyUs = [
-  "Senior team, no hand-offs to juniors",
-  "Clear process and transparent pricing",
-  "Performance and accessibility by default",
-  "Long-term partnership and 24/7 support",
-];
-
 export default async function AboutPage() {
   const [team, hs] = await Promise.all([getTeam(), getHomeSections()]);
+  const t = getUI(await getLocale());
+  const whyUs = t.pages.about.whyUs.items;
   return (
     <>
       <Section>
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <Reveal>
-            <Badge>About GCC App</Badge>
-            <h1 className="mt-5">Level up your business with GCC App</h1>
+            <Badge>{t.pages.about.badge}</Badge>
+            <h1 className="mt-5">{t.pages.about.title}</h1>
             <p className="mt-5 text-lg">
-              We specialize in building powerful mobile applications, web
-              applications and modern websites that help businesses grow and
-              succeed in the digital world. Our team develops scalable, secure and
-              user-friendly solutions tailored to the unique needs of each client.
+              {t.pages.about.intro1}
             </p>
             <p className="mt-4">
-              By combining technology, creativity and strategy, we deliver
-              end-to-end digital solutions that drive measurable success.
+              {t.pages.about.intro2}
             </p>
           </Reveal>
           <Reveal delay={0.1}>
             <ParallaxImage
               src="/media/images/09-about-lifestyle.webp"
-              alt="The GCC App team collaborating in a bright modern office"
+              alt={t.pages.about.imageAlt}
               priority
               className="aspect-[16/10] rounded-[var(--radius-lg)] border border-border shadow-sm"
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -68,9 +61,9 @@ export default async function AboutPage() {
       <Section tone="surface">
         <div className="grid gap-12 lg:grid-cols-2">
           <SectionHeading
-            eyebrow="Why us"
-            title="The difference is in the details"
-            description="We sweat the things that make products feel premium — and the ones that move your numbers."
+            eyebrow={t.pages.about.whyUs.eyebrow}
+            title={t.pages.about.whyUs.title}
+            description={t.pages.about.whyUs.description}
             align="left"
           />
           <ul className="space-y-4">
@@ -90,9 +83,9 @@ export default async function AboutPage() {
 
       <Section id="team">
         <SectionHeading
-          eyebrow="Our people"
-          title="The people behind the work"
-          description="A close-knit team of designers, engineers and strategists — here's what each of us is working on."
+          eyebrow={t.pages.about.ourPeople.eyebrow}
+          title={t.pages.about.ourPeople.title}
+          description={t.pages.about.ourPeople.description}
         />
         <Container className="mt-14 px-0">
           <TeamGrid members={team} />

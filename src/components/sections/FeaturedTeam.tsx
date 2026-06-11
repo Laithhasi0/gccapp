@@ -4,12 +4,15 @@ import { Button } from "@/components/ui/Button";
 import { TeamCard } from "@/components/ui/TeamCard";
 import { Reveal } from "@/components/motion/Reveal";
 import { getFeaturedTeam } from "@/lib/getTeam";
+import { getLocale } from "@/lib/getLocale";
+import { getUI } from "@/lib/i18n";
 import type { Heading } from "@/lib/cms";
 
 /** Home-page variant: featured people + "Meet the team" link. */
 export async function FeaturedTeam({ heading }: { heading?: Heading }) {
   const members = await getFeaturedTeam(4);
   if (!members.length) return null;
+  const t = getUI(await getLocale());
 
   return (
     <section className="py-16 sm:py-20 lg:py-28">
@@ -28,7 +31,7 @@ export async function FeaturedTeam({ heading }: { heading?: Heading }) {
         </div>
         <div className="mt-10 text-center">
           <Button href="/about#team" variant="ghost">
-            Meet the team
+            {t.buttons.meetTeam}
           </Button>
         </div>
       </Container>

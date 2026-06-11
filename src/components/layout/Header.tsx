@@ -9,11 +9,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { EditPencil } from "@/components/edit/EditPencil";
-import { mainNav } from "@/content/site";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import type { NavItem } from "@/lib/i18n";
 import type { SiteSettings } from "@/lib/cms";
 import { cn } from "@/lib/utils";
 
-export function Header({ settings }: { settings: SiteSettings }) {
+export function Header({ settings, nav }: { settings: SiteSettings; nav: NavItem[] }) {
   // Starts false to match server render (avoids hydration mismatch); the effect
   // syncs the real scroll position on mount.
   const [scrolled, setScrolled] = useState(false);
@@ -67,7 +68,7 @@ export function Header({ settings }: { settings: SiteSettings }) {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
-          {mainNav.map((item) => {
+          {nav.map((item) => {
             const active =
               pathname === item.href ||
               (item.href !== "/" && pathname.startsWith(item.href));
@@ -170,6 +171,7 @@ export function Header({ settings }: { settings: SiteSettings }) {
             <Phone className="h-4 w-4" />
             {settings.contact.phone}
           </a>
+          <LanguageSwitcher />
           <Button href={settings.headerCta.href} size="sm">
             {settings.headerCta.label}
           </Button>
@@ -204,7 +206,7 @@ export function Header({ settings }: { settings: SiteSettings }) {
                 if ((e.target as HTMLElement).closest("a")) setMobileOpen(false);
               }}
             >
-              {mainNav.map((item) => (
+              {nav.map((item) => (
                 <div key={item.href} className="border-b border-border/70 last:border-0">
                   <Link
                     href={item.href}
@@ -227,9 +229,12 @@ export function Header({ settings }: { settings: SiteSettings }) {
                   )}
                 </div>
               ))}
-              <Button href={settings.headerCta.href} className="mt-4 w-full">
-                {settings.headerCta.label}
-              </Button>
+              <div className="mt-4 flex items-center gap-3">
+                <LanguageSwitcher />
+                <Button href={settings.headerCta.href} className="flex-1">
+                  {settings.headerCta.label}
+                </Button>
+              </div>
             </nav>
           </motion.div>
         )}

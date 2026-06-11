@@ -13,26 +13,30 @@ import { Reveal } from "@/components/motion/Reveal";
 import { Editable } from "@/components/edit/Editable";
 import { EditPencil } from "@/components/edit/EditPencil";
 import { Mail, Phone, MapPin } from "lucide-react";
-import { site } from "@/content/site";
 import {
   getProjects,
   getHero,
   getCapabilities,
   getCaseStudies,
   getHomeSections,
+  getSiteSettings,
 } from "@/lib/cms";
+import { getLocale } from "@/lib/getLocale";
+import { getUI } from "@/lib/i18n";
 
 // Renders CMS content at request time (updates with no redeploy).
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [projects, hero, capabilities, caseStudies, hs] = await Promise.all([
+  const [projects, hero, capabilities, caseStudies, hs, settings] = await Promise.all([
     getProjects(),
     getHero(),
     getCapabilities(),
     getCaseStudies(),
     getHomeSections(),
+    getSiteSettings(),
   ]);
+  const t = getUI(await getLocale());
   return (
     <>
       <Editable href="/admin/globals/home-hero" label="Hero">
@@ -65,9 +69,9 @@ export default async function Home() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <Reveal>
               <SectionHeading
-                eyebrow="Contact"
-                title="Let's talk about your project"
-                description="Tell us what you're building. We'll reply within one business day."
+                eyebrow={t.pages.home.contact.eyebrow}
+                title={t.pages.home.contact.title}
+                description={t.pages.home.contact.description}
                 align="left"
               />
               <ul className="mt-8 space-y-4 text-sm">
@@ -75,23 +79,23 @@ export default async function Home() {
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-accent">
                     <Mail className="h-5 w-5" />
                   </span>
-                  <a href={`mailto:${site.contact.email}`} className="text-ink hover:text-accent">
-                    {site.contact.email}
+                  <a href={`mailto:${settings.contact.email}`} className="text-ink hover:text-accent">
+                    {settings.contact.email}
                   </a>
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-accent">
                     <Phone className="h-5 w-5" />
                   </span>
-                  <a href={site.contact.phoneHref} className="text-ink hover:text-accent">
-                    {site.contact.phone}
+                  <a href={settings.contact.phoneHref} className="text-ink hover:text-accent">
+                    {settings.contact.phone}
                   </a>
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-accent">
                     <MapPin className="h-5 w-5" />
                   </span>
-                  <span className="text-ink">{site.contact.address}</span>
+                  <span className="text-ink">{settings.contact.address}</span>
                 </li>
               </ul>
             </Reveal>

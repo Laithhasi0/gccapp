@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TeamCard } from "@/components/ui/TeamCard";
 import { getDepartments } from "@/content/team";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { TeamMember } from "@/content/types";
 
 export function TeamGrid({
@@ -12,6 +13,7 @@ export function TeamGrid({
   members: TeamMember[];
   showFilter?: boolean;
 }) {
+  const { t } = useI18n();
   const departments = getDepartments(members);
   const [active, setActive] = useState<string>("All");
 
@@ -38,7 +40,7 @@ export function TeamGrid({
                   : "bg-accent-soft text-accent hover:bg-accent-soft/70"
               }`}
             >
-              {c}
+              {c === "All" ? t.filter.all : (t.departments[c] ?? c)}
             </button>
           ))}
         </div>

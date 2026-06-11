@@ -10,6 +10,8 @@ import { CTASection } from "@/components/ui/CTASection";
 import { Editable } from "@/components/edit/Editable";
 import { ArrowLeft } from "lucide-react";
 import { getCaseStudy } from "@/lib/cms";
+import { getLocale } from "@/lib/getLocale";
+import { getUI } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +38,7 @@ export default async function CaseStudyDetail({
   const { slug } = await params;
   const study = await getCaseStudy(slug);
   if (!study) notFound();
+  const t = getUI(await getLocale());
 
   return (
     <Editable href="/admin/collections/case-studies" label="this case study">
@@ -44,10 +47,10 @@ export default async function CaseStudyDetail({
           href="/case-studies"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-accent"
         >
-          <ArrowLeft className="h-4 w-4" /> All case studies
+          <ArrowLeft className="h-4 w-4" /> {t.pages.caseStudies.allCaseStudies}
         </Link>
         <Reveal className="mt-8 max-w-3xl">
-          <Badge>{study.category}</Badge>
+          <Badge>{t.categories[study.category] ?? study.category}</Badge>
           <h1 className="mt-5">{study.title}</h1>
           <p className="mt-4 text-lg">{study.summary}</p>
         </Reveal>

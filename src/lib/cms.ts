@@ -7,8 +7,26 @@ import { site, stats as seedStats, processSteps as seedProcess } from "@/content
 import { caseStudies as seedCaseStudies } from "@/content/caseStudies";
 import { faqs as seedFaqs } from "@/content/faqs";
 import { careers as seedCareers, type Career } from "@/content/careers";
+import {
+  servicesAr,
+  projectsAr,
+  caseStudiesAr,
+  faqsAr,
+  careersAr,
+  statsAr,
+  processStepsAr,
+  processMetaAr,
+  heroDefaultsAr,
+  siteDefaultsAr,
+  homeSectionsAr,
+  capabilitiesAr,
+} from "@/content/ar";
 import { iconFor } from "./serviceIcons";
+import { getLocale } from "./getLocale";
+import type { Locale } from "./i18n";
 import type { Service, Project, CaseStudy, Faq, ProcessStep } from "@/content/types";
+
+const isAr = (l: Locale) => l === "ar";
 
 type MediaDoc = {
   url?: string | null;
@@ -54,6 +72,7 @@ function mapService(doc: ServiceDoc): Service {
 }
 
 export async function getServices(): Promise<Service[]> {
+  const locale = await getLocale();
   try {
     const payload = await getPayload({ config });
     const res = await payload.find({
@@ -61,13 +80,13 @@ export async function getServices(): Promise<Service[]> {
       sort: "order",
       depth: 1,
       limit: 100,
-      locale: "en",
+      locale,
     });
     if (res.docs.length) return (res.docs as unknown as ServiceDoc[]).map(mapService);
   } catch {
     // CMS unreachable — fall back to seed content.
   }
-  return seedServices;
+  return isAr(locale) ? servicesAr : seedServices;
 }
 
 export async function getService(slug: string): Promise<Service | undefined> {
@@ -117,6 +136,7 @@ function mapProject(doc: ProjectDoc): Project {
 }
 
 export async function getProjects(): Promise<Project[]> {
+  const locale = await getLocale();
   try {
     const payload = await getPayload({ config });
     const res = await payload.find({
@@ -124,13 +144,13 @@ export async function getProjects(): Promise<Project[]> {
       sort: "order",
       depth: 1,
       limit: 100,
-      locale: "en",
+      locale,
     });
     if (res.docs.length) return (res.docs as unknown as ProjectDoc[]).map(mapProject);
   } catch {
     // CMS unreachable — fall back to seed content.
   }
-  return seedProjects;
+  return isAr(locale) ? projectsAr : seedProjects;
 }
 
 export async function getProject(slug: string): Promise<Project | undefined> {
@@ -174,34 +194,43 @@ export type AppearanceData = {
   backgroundColor?: string;
 };
 
-async function findGlobal<T>(slug: string): Promise<T | null> {
+async function findGlobal<T>(slug: string, locale: Locale): Promise<T | null> {
   try {
     const payload = await getPayload({ config });
-    return (await payload.findGlobal({ slug, locale: "en", depth: 1 })) as T;
+    return (await payload.findGlobal({ slug, locale, depth: 1 })) as T;
   } catch {
     return null;
   }
 }
 
 export async function getSiteSettings(): Promise<SiteSettings> {
-  const g = await findGlobal<Record<string, unknown>>("site-settings");
+  const locale = await getLocale();
+  const ar = isAr(locale);
+  const g = await findGlobal<Record<string, unknown>>("site-settings", locale);
   const contact = (g?.contact as SiteSettings["contact"]) || undefined;
   const cta = (g?.headerCta as { label?: string; href?: string }) || {};
   const socials = (g?.socials as { platform: string; url: string }[]) || [];
   return {
     siteName: (g?.siteName as string) || site.name,
-    availabilityText: (g?.availabilityText as string) || "Available for projects",
+    availabilityText:
+      (g?.availabilityText as string) ||
+      (ar ? siteDefaultsAr.availabilityText : "Available for projects"),
     logo: url(g?.logo as MediaDoc, "card"),
     contact: {
       email: contact?.email || site.contact.email,
       phone: contact?.phone || site.contact.phone,
       phoneHref: contact?.phoneHref || site.contact.phoneHref,
-      address: contact?.address || site.contact.address,
+      address: contact?.address || (ar ? siteDefaultsAr.address : site.contact.address),
     },
     footerBlurb:
       (g?.footerBlurb as string) ||
-      "GCC App delivers innovative digital solutions, apps and services designed to simplify your business operations and boost productivity.",
-    headerCta: { label: cta.label || "Contact Us", href: cta.href || "/contact" },
+      (ar
+        ? siteDefaultsAr.footerBlurb
+        : "GCC App delivers innovative digital solutions, apps and services designed to simplify your business operations and boost productivity."),
+    headerCta: {
+      label: cta.label || (ar ? siteDefaultsAr.headerCtaLabel : "Contact Us"),
+      href: cta.href || "/contact",
+    },
     socials: socials.length
       ? socials.map((s) => ({ platform: s.platform, url: s.url }))
       : site.socials.map((s) => ({ platform: s.icon, url: s.href })),
@@ -209,30 +238,42 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 }
 
 export async function getHero(): Promise<HeroData> {
-  const g = await findGlobal<Record<string, unknown>>("home-hero");
+  const locale = await getLocale();
+  const ar = isAr(locale);
+  const g = await findGlobal<Record<string, unknown>>("home-hero", locale);
   const p = (g?.primaryCta as { label?: string; href?: string }) || {};
   const s = (g?.secondaryCta as { label?: string; href?: string }) || {};
   const stats = (g?.stats as { value: string; label: string }[]) || [];
+  const seedStatsForLocale = ar ? statsAr : seedStats;
   return {
-    badge: (g?.badge as string) || "Digital solutions agency · Riyadh",
-    headline: (g?.headline as string) || "Level up your business with",
-    highlight: (g?.highlight as string) || "GCC App",
+    badge: (g?.badge as string) || (ar ? heroDefaultsAr.badge : "Digital solutions agency · Riyadh"),
+    headline: (g?.headline as string) || (ar ? heroDefaultsAr.headline : "Level up your business with"),
+    highlight: (g?.highlight as string) || (ar ? heroDefaultsAr.highlight : "GCC App"),
     subheading:
       (g?.subheading as string) ||
-      "We build powerful mobile applications, web applications and modern websites that help businesses grow and succeed in the digital world.",
-    primaryCta: { label: p.label || "Get Started", href: p.href || "/contact" },
-    secondaryCta: { label: s.label || "View Portfolio", href: s.href || "/portfolio" },
+      (ar
+        ? heroDefaultsAr.subheading
+        : "We build powerful mobile applications, web applications and modern websites that help businesses grow and succeed in the digital world."),
+    primaryCta: {
+      label: p.label || (ar ? heroDefaultsAr.primaryCtaLabel : "Get Started"),
+      href: p.href || "/contact",
+    },
+    secondaryCta: {
+      label: s.label || (ar ? heroDefaultsAr.secondaryCtaLabel : "View Portfolio"),
+      href: s.href || "/portfolio",
+    },
     posterImage: url(g?.posterImage as MediaDoc, "wide") || "/media/images/15-og-share-card.webp",
     backgroundVideoUrl: (g?.backgroundVideoUrl as string) || "/media/video/hero-background-loop.mp4",
     showStats: g?.showStats !== false,
     stats: stats.length
       ? stats
-      : seedStats.map((st) => ({ value: `${st.prefix ?? ""}${st.value}${st.suffix ?? ""}`, label: st.label })),
+      : seedStatsForLocale.map((st) => ({ value: `${st.prefix ?? ""}${st.value}${st.suffix ?? ""}`, label: st.label })),
   };
 }
 
 export async function getAppearance(): Promise<AppearanceData> {
-  const g = await findGlobal<Record<string, unknown>>("appearance");
+  const locale = await getLocale();
+  const g = await findGlobal<Record<string, unknown>>("appearance", locale);
   return {
     theme: ((g?.theme as string) === "light" ? "light" : "dark"),
     accentColor: (g?.accentColor as string) || "#25c9e2",
@@ -243,7 +284,7 @@ export async function getAppearance(): Promise<AppearanceData> {
 
 /* ------------------------- more collections ------------------------------ */
 
-async function findDocs<T>(collection: string): Promise<T[] | null> {
+async function findDocs<T>(collection: string, locale: Locale): Promise<T[] | null> {
   try {
     const payload = await getPayload({ config });
     const res = await payload.find({
@@ -251,7 +292,7 @@ async function findDocs<T>(collection: string): Promise<T[] | null> {
       sort: "order",
       depth: 1,
       limit: 100,
-      locale: "en",
+      locale,
     });
     return res.docs.length ? (res.docs as unknown as T[]) : null;
   } catch {
@@ -270,8 +311,9 @@ type CaseStudyDoc = {
 };
 
 export async function getCaseStudies(): Promise<CaseStudy[]> {
-  const docs = await findDocs<CaseStudyDoc>("case-studies");
-  if (!docs) return seedCaseStudies;
+  const locale = await getLocale();
+  const docs = await findDocs<CaseStudyDoc>("case-studies", locale);
+  if (!docs) return isAr(locale) ? caseStudiesAr : seedCaseStudies;
   return docs.map((d) => ({
     slug: d.slug,
     title: d.title,
@@ -288,13 +330,15 @@ export async function getCaseStudy(slug: string): Promise<CaseStudy | undefined>
 }
 
 export async function getFaqs(): Promise<Faq[]> {
-  const docs = await findDocs<Faq>("faqs");
-  return docs ?? seedFaqs;
+  const locale = await getLocale();
+  const docs = await findDocs<Faq>("faqs", locale);
+  return docs ?? (isAr(locale) ? faqsAr : seedFaqs);
 }
 
 export async function getCareers(): Promise<Career[]> {
-  const docs = await findDocs<Career>("careers");
-  return docs ?? seedCareers;
+  const locale = await getLocale();
+  const docs = await findDocs<Career>("careers", locale);
+  return docs ?? (isAr(locale) ? careersAr : seedCareers);
 }
 
 export async function getCareer(slug: string): Promise<Career | undefined> {
@@ -311,15 +355,19 @@ export type ProcessData = {
 };
 
 export async function getProcess(): Promise<ProcessData> {
-  const g = await findGlobal<Record<string, unknown>>("home-process");
+  const locale = await getLocale();
+  const ar = isAr(locale);
+  const g = await findGlobal<Record<string, unknown>>("home-process", locale);
   const steps = (g?.steps as ProcessStep[]) || [];
   return {
-    eyebrow: (g?.eyebrow as string) || "How we work",
-    heading: (g?.heading as string) || "A clear, proven process",
+    eyebrow: (g?.eyebrow as string) || (ar ? processMetaAr.eyebrow : "How we work"),
+    heading: (g?.heading as string) || (ar ? processMetaAr.heading : "A clear, proven process"),
     description:
       (g?.description as string) ||
-      "Six calm steps from first conversation to a confident launch — and the support that follows.",
-    steps: steps.length ? steps : seedProcess,
+      (ar
+        ? processMetaAr.description
+        : "Six calm steps from first conversation to a confident launch — and the support that follows."),
+    steps: steps.length ? steps : ar ? processStepsAr : seedProcess,
   };
 }
 
@@ -360,9 +408,25 @@ const seedHomeSections: HomeSectionsData = {
   },
 };
 
+const arHomeSections: HomeSectionsData = {
+  services: homeSectionsAr.services,
+  selectedWork: homeSectionsAr.selectedWork,
+  caseStudies: homeSectionsAr.caseStudies,
+  team: homeSectionsAr.team,
+  stats: statsAr.map((s) => ({ value: `${s.prefix ?? ""}${s.value}${s.suffix ?? ""}`, label: s.label })),
+  cta: {
+    title: homeSectionsAr.cta.title,
+    description: homeSectionsAr.cta.description,
+    buttonLabel: homeSectionsAr.cta.buttonLabel,
+    buttonHref: "/contact",
+  },
+};
+
 export async function getHomeSections(): Promise<HomeSectionsData> {
-  const g = await findGlobal<Record<string, unknown>>("home-sections");
-  if (!g) return seedHomeSections;
+  const locale = await getLocale();
+  const base = isAr(locale) ? arHomeSections : seedHomeSections;
+  const g = await findGlobal<Record<string, unknown>>("home-sections", locale);
+  if (!g) return base;
   const heading = (v: unknown, fb: Heading): Heading => {
     const h = (v as Partial<Heading>) || {};
     return { eyebrow: h.eyebrow || fb.eyebrow, title: h.title || fb.title, description: h.description ?? fb.description };
@@ -370,16 +434,16 @@ export async function getHomeSections(): Promise<HomeSectionsData> {
   const stats = (g.stats as { value: string; label: string }[]) || [];
   const cta = (g.cta as Partial<HomeSectionsData["cta"]>) || {};
   return {
-    services: heading(g.services, seedHomeSections.services),
-    selectedWork: heading(g.selectedWork, seedHomeSections.selectedWork),
-    caseStudies: heading(g.caseStudies, seedHomeSections.caseStudies),
-    team: heading(g.team, seedHomeSections.team),
-    stats: stats.length ? stats : seedHomeSections.stats,
+    services: heading(g.services, base.services),
+    selectedWork: heading(g.selectedWork, base.selectedWork),
+    caseStudies: heading(g.caseStudies, base.caseStudies),
+    team: heading(g.team, base.team),
+    stats: stats.length ? stats : base.stats,
     cta: {
-      title: cta.title || seedHomeSections.cta.title,
-      description: cta.description || seedHomeSections.cta.description,
-      buttonLabel: cta.buttonLabel || seedHomeSections.cta.buttonLabel,
-      buttonHref: cta.buttonHref || seedHomeSections.cta.buttonHref,
+      title: cta.title || base.cta.title,
+      description: cta.description || base.cta.description,
+      buttonLabel: cta.buttonLabel || base.cta.buttonLabel,
+      buttonHref: cta.buttonHref || base.cta.buttonHref,
     },
   };
 }
@@ -399,8 +463,17 @@ const seedCapabilities: CapabilityItem[] = [
   { image: "/media/images/cap-growth.webp", eyebrow: "Marketing & Growth", title: "Made to grow", text: "Performance marketing and SEO that earn attention and compound into durable, measurable growth.", href: "/services/digital-marketing" },
 ];
 
+const arCapabilities: CapabilityItem[] = seedCapabilities.map((c, i) => ({
+  ...c,
+  eyebrow: capabilitiesAr.items[i]?.eyebrow ?? c.eyebrow,
+  title: capabilitiesAr.items[i]?.title ?? c.title,
+  text: capabilitiesAr.items[i]?.text ?? c.text,
+}));
+
 export async function getCapabilities(): Promise<{ eyebrow: string; items: CapabilityItem[] }> {
-  const g = await findGlobal<Record<string, unknown>>("home-capabilities");
+  const locale = await getLocale();
+  const ar = isAr(locale);
+  const g = await findGlobal<Record<string, unknown>>("home-capabilities", locale);
   const rawItems = (g?.items as Array<Record<string, unknown>>) || [];
   const items: CapabilityItem[] = rawItems.map((it) => ({
     image: url(it.image as MediaDoc, "card") ?? "",
@@ -410,7 +483,7 @@ export async function getCapabilities(): Promise<{ eyebrow: string; items: Capab
     href: (it.href as string) || "/services",
   }));
   return {
-    eyebrow: (g?.eyebrow as string) || "What we do",
-    items: items.length ? items : seedCapabilities,
+    eyebrow: (g?.eyebrow as string) || (ar ? capabilitiesAr.eyebrow : "What we do"),
+    items: items.length ? items : ar ? arCapabilities : seedCapabilities,
   };
 }

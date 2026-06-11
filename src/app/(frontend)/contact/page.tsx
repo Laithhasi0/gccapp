@@ -5,7 +5,9 @@ import { Reveal } from "@/components/motion/Reveal";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { Editable } from "@/components/edit/Editable";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
-import { site } from "@/content/site";
+import { getSiteSettings, getServices } from "@/lib/cms";
+import { getLocale } from "@/lib/getLocale";
+import { getUI } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -13,24 +15,27 @@ export const metadata: Metadata = {
     "Get in touch with GCC App. Tell us about your project and we'll reply within one business day.",
 };
 
-const details = [
-  { icon: Mail, label: "Email", value: site.contact.email, href: `mailto:${site.contact.email}` },
-  { icon: Phone, label: "Phone", value: site.contact.phone, href: site.contact.phoneHref },
-  { icon: MapPin, label: "Office", value: site.contact.address },
-  { icon: Clock, label: "Hours", value: "Sun–Thu, 9:00–18:00 · 24/7 support" },
-];
+export const dynamic = "force-dynamic";
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const t = getUI(await getLocale());
+  const settings = await getSiteSettings();
+  const serviceOptions = (await getServices()).map((s) => s.title);
+  const details = [
+    { icon: Mail, label: t.contactDetails.email, value: settings.contact.email, href: `mailto:${settings.contact.email}` },
+    { icon: Phone, label: t.contactDetails.phone, value: settings.contact.phone, href: settings.contact.phoneHref },
+    { icon: MapPin, label: t.contactDetails.office, value: settings.contact.address },
+    { icon: Clock, label: t.contactDetails.hours, value: t.contactDetails.hoursValue },
+  ];
   return (
     <Editable href="/admin/globals/site-settings" label="Contact details">
       <Section>
         <div className="grid gap-12 lg:grid-cols-5">
         <Reveal className="lg:col-span-2">
-          <Badge>Contact</Badge>
-          <h1 className="mt-5">Let&apos;s build something exceptional</h1>
+          <Badge>{t.pages.contact.badge}</Badge>
+          <h1 className="mt-5">{t.pages.contact.title}</h1>
           <p className="mt-5 text-lg">
-            Tell us about your project and we&apos;ll get back to you within one
-            business day.
+            {t.pages.contact.intro}
           </p>
           <ul className="mt-10 space-y-5">
             {details.map((d) => {
@@ -63,7 +68,7 @@ export default function ContactPage() {
 
         <Reveal delay={0.1} className="lg:col-span-3">
           <div className="rounded-[var(--radius-lg)] border border-border bg-surface p-6 shadow-sm sm:p-8">
-            <ContactForm />
+            <ContactForm serviceOptions={serviceOptions} />
           </div>
         </Reveal>
         </div>

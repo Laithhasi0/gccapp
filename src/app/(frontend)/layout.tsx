@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Space_Grotesk, Inter, Cairo } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -9,8 +9,11 @@ import { AnimatedBackground } from "@/components/motion/AnimatedBackground";
 import { LiveAppearance } from "@/components/motion/LiveAppearance";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { EditProvider } from "@/components/edit/EditProvider";
+import { LocaleProvider } from "@/components/i18n/LocaleProvider";
 import { OrganizationJsonLd } from "@/components/JsonLd";
 import { getSiteSettings, getAppearance } from "@/lib/cms";
+import { getLocale } from "@/lib/getLocale";
+import { getUI, getNav, dir } from "@/lib/i18n";
 import { site } from "@/content/site";
 
 const display = Space_Grotesk({
@@ -24,6 +27,13 @@ const body = Inter({
   variable: "--ff-body",
   subsets: ["latin"],
   display: "swap",
+});
+
+const arabic = Cairo({
+  variable: "--ff-arabic",
+  subsets: ["arabic"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -66,6 +76,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = getUI(locale);
+  const nav = getNav(locale);
   const [settings, appearance] = await Promise.all([
     getSiteSettings(),
     getAppearance(),
@@ -79,9 +92,10 @@ export default async function RootLayout({
 
   return (
     <html
-      lang="en"
+      lang={locale}
+      dir={dir(locale)}
       style={accentStyle}
-      className={`${appearance.theme === "light" ? "" : "dark"} ${display.variable} ${body.variable} h-full antialiased`}
+      className={`${appearance.theme === "light" ? "" : "dark"} ${display.variable} ${body.variable} ${arabic.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-ink">
         <OrganizationJsonLd />
@@ -89,20 +103,22 @@ export default async function RootLayout({
         <AnimatedBackground />
         <SmoothScroll />
         <ScrollProgress />
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-accent-contrast"
-        >
-          Skip to content
-        </a>
-        <EditProvider>
-          <Header settings={settings} />
-          <main id="main" className="relative z-10 flex-1">
-            {children}
-          </main>
-          <Footer settings={settings} />
-        </EditProvider>
-        <ScrollToTop />
+        <LocaleProvider locale={locale} messages={messages}>
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-accent-contrast"
+          >
+            {messages.skipToContent}
+          </a>
+          <EditProvider>
+            <Header settings={settings} nav={nav} />
+            <main id="main" className="relative z-10 flex-1">
+              {children}
+            </main>
+            <Footer settings={settings} nav={nav} />
+          </EditProvider>
+          <ScrollToTop />
+        </LocaleProvider>
       </body>
     </html>
   );
