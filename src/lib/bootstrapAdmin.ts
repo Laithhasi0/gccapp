@@ -15,9 +15,9 @@ import type { Payload } from "payload";
  * env vars if you ever need to. Change the password in the dashboard right
  * after the first sign-in.
  */
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@gccapp.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "zaidjalal@gccappadmin.com";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "GccApp@2026!";
-const ADMIN_NAME = process.env.ADMIN_NAME || "GCC App Admin";
+const ADMIN_NAME = process.env.ADMIN_NAME || "Zaid Jalal";
 
 export async function ensureBootstrapAdmin(payload: Payload): Promise<void> {
   try {
