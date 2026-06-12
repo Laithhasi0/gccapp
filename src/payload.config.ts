@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import { replitObjectStorageAdapter } from "./lib/objectStorage";
 import { postgresStorageAdapter } from "./lib/postgresStorage";
 import { ensureBootstrapAdmin } from "./lib/bootstrapAdmin";
+import { autoSeedOnInit } from "./lib/seedContent";
 
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
@@ -92,6 +93,28 @@ export default buildConfig({
   editor: lexicalEditor(),
   onInit: async (payload) => {
     await ensureBootstrapAdmin(payload);
+    // Import the site's built-in content (Arabic + English + images) into the
+    // CMS so EVERYTHING visible on the site is editable from the dashboard —
+    // automatically, on a fresh deploy, without anyone clicking a button. Runs
+    // exactly once per database (guarded by a marker + non-blocking advisory
+    // lock), so it never blocks startup and never resurrects content the user
+    // intentionally deleted. An already-seeded environment is a fast no-op.
+    try {
+      const report = await autoSeedOnInit(payload);
+      if (report) {
+        const imported = Object.entries(report)
+          .filter(([, status]) => !String(status).includes("skipped"))
+          .map(([name]) => name);
+        payload.logger.info(
+          imported.length
+            ? `Content auto-seed on init: seeded ${imported.join(", ")}`
+            : "Content auto-seed on init: database already populated",
+        );
+      }
+    } catch (err) {
+      // Never block startup on a seeding hiccup.
+      payload.logger.warn(`Content auto-seed on init skipped: ${String(err)}`);
+    }
   },
   secret: process.env.PAYLOAD_SECRET || "dev-secret-change-me",
   typescript: {

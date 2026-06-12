@@ -1,6 +1,7 @@
 import "server-only";
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
+import { Pool } from "pg";
 import type { Payload } from "payload";
 import { services as seedServices } from "@/content/services";
 import { projects as seedProjects } from "@/content/projects";
@@ -101,6 +102,66 @@ const iconNameOf = (icon: unknown): string =>
 
 export type SeedReport = Record<string, string>;
 
+const SEED_LOCK_KEY = 427711; // dedicated advisory-lock id for content auto-seed
+
+/**
+ * Auto-seed used on server startup (payload.config `onInit`). Runs the content
+ * import exactly once for a brand-new database, then records a marker so it
+ * never runs again. This is what stops a redeploy from resurrecting content the
+ * user intentionally deleted from the dashboard — the per-collection "only fill
+ * if empty" rule alone can't tell "never seeded" apart from "user emptied it".
+ *
+ * Concurrency-safe on Autoscale: the advisory lock is taken with
+ * `pg_try_advisory_lock` (non-blocking), so a second cold-starting instance
+ * simply skips instead of waiting — startup is never delayed or blocked.
+ * Returns the seed report when it seeded, or `null` when it skipped.
+ */
+export async function autoSeedOnInit(payload: Payload): Promise<SeedReport | null> {
+  const connectionString = process.env.DATABASE_URI || process.env.DATABASE_URL;
+  if (!connectionString) return null; // no DB URL — leave it to the manual button
+  const pool = new Pool({ connectionString, max: 1, allowExitOnIdle: true });
+  const client = await pool.connect();
+  let locked = false;
+  try {
+    await client.query(
+      `CREATE TABLE IF NOT EXISTS app_seed_state (
+         id         integer PRIMARY KEY DEFAULT 1,
+         seeded_at  timestamptz NOT NULL DEFAULT now(),
+         CONSTRAINT app_seed_state_singleton CHECK (id = 1)
+       )`,
+    );
+    const lock = await client.query<{ ok: boolean }>(
+      "SELECT pg_try_advisory_lock($1) AS ok",
+      [SEED_LOCK_KEY],
+    );
+    locked = lock.rows[0]?.ok === true;
+    if (!locked) return null; // another instance holds the lock / is seeding — skip
+    const already = await client.query("SELECT 1 FROM app_seed_state WHERE id = 1");
+    if ((already.rowCount ?? 0) > 0) return null; // already auto-seeded once — skip
+    const report = await importWebsiteContent(payload);
+    await client.query(
+      "INSERT INTO app_seed_state (id) VALUES (1) ON CONFLICT (id) DO NOTHING",
+    );
+    return report;
+  } finally {
+    if (locked) {
+      try {
+        await client.query("SELECT pg_advisory_unlock($1)", [SEED_LOCK_KEY]);
+      } catch {
+        /* lock auto-releases when the session ends on pool.end() below */
+      }
+    }
+    client.release();
+    await pool.end();
+  }
+}
+
+/**
+ * Copies the site's built-in bilingual content + images into the CMS
+ * collections. Idempotent and non-destructive: each collection is filled only
+ * when it is still empty, so existing or edited content is never touched. Safe
+ * to call repeatedly — the manual "Import website content" button uses this.
+ */
 export async function importWebsiteContent(payload: Payload): Promise<SeedReport> {
   const report: SeedReport = {};
   const media = new Map<string, number | string | null>();
