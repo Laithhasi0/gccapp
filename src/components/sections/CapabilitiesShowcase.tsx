@@ -10,6 +10,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Container } from "@/components/ui/Container";
 import { EditPencil } from "@/components/edit/EditPencil";
 import { useEditMode, useEditReady } from "@/components/edit/EditProvider";
+import { EditableText } from "@/components/edit/EditableText";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 
 type Cap = {
@@ -20,8 +21,20 @@ type Cap = {
   href: string;
 };
 
-function Capability({ cap, index, total }: { cap: Cap; index: number; total: number }) {
+function Capability({
+  cap,
+  index,
+  total,
+  editPath,
+}: {
+  cap: Cap;
+  index: number;
+  total: number;
+  editPath?: string;
+}) {
   const { t } = useI18n();
+  const text = (field: string, value: string) =>
+    editPath ? <EditableText path={`${editPath}.items.${index}.${field}`} value={value} /> : value;
   return (
     <Container className="grid w-full items-center gap-8 lg:grid-cols-2 lg:gap-14">
       <div className="order-2 lg:order-1">
@@ -29,12 +42,12 @@ function Capability({ cap, index, total }: { cap: Cap; index: number; total: num
           {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
         </span>
         <div className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-muted">
-          {cap.eyebrow}
+          {text("eyebrow", cap.eyebrow)}
         </div>
         <h3 className="mt-2 text-4xl sm:text-5xl">
-          <span className="text-gradient">{cap.title}</span>
+          <span className="text-gradient">{text("title", cap.title)}</span>
         </h3>
-        <p className="mt-5 max-w-md text-lg">{cap.text}</p>
+        <p className="mt-5 max-w-md text-lg">{text("text", cap.text)}</p>
         <Link
           href={cap.href}
           className="mt-7 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:underline"
@@ -69,9 +82,11 @@ function Capability({ cap, index, total }: { cap: Cap; index: number; total: num
 export function CapabilitiesShowcase({
   eyebrow = "What we do",
   items,
+  editPath,
 }: {
   eyebrow?: string;
   items: Cap[];
+  editPath?: string;
 }) {
   const { t } = useI18n();
   const caps = items;
@@ -130,13 +145,13 @@ export function CapabilitiesShowcase({
         <EditPencil href="/admin/globals/home-capabilities" label="What we do" />
         <Container>
           <span className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">
-            {eyebrow}
+            {editPath ? <EditableText path={`${editPath}.eyebrow`} value={eyebrow} /> : eyebrow}
           </span>
           <h2 className="mt-2">{t.caps.headingFull}</h2>
         </Container>
         <div className="mt-12 space-y-16">
           {caps.map((c, i) => (
-            <Capability key={c.title} cap={c} index={i} total={caps.length} />
+            <Capability key={`${c.title}-${i}`} cap={c} index={i} total={caps.length} editPath={editPath} />
           ))}
         </div>
       </section>

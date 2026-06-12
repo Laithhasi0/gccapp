@@ -21,7 +21,17 @@ import { HomeHero } from "./globals/HomeHero";
 import { HomeProcess } from "./globals/HomeProcess";
 import { HomeCapabilities } from "./globals/HomeCapabilities";
 import { HomeSections } from "./globals/HomeSections";
+import { HomePage } from "./globals/HomePage";
 import { Appearance } from "./globals/Appearance";
+
+// The Visual Editor (/editor) is now the home page's source of truth via the
+// home-page global. The legacy per-section home globals stay registered (they
+// seed the editor's first save and remain the fallback until then) but are
+// hidden from the admin nav to avoid two competing editing paths.
+const legacyHomeGlobals = [HomeHero, HomeProcess, HomeCapabilities, HomeSections].map((g) => ({
+  ...g,
+  admin: { ...g.admin, hidden: true },
+}));
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -57,7 +67,7 @@ export default buildConfig({
         return base; // globals preview the home page
       },
       collections: ["services", "projects", "case-studies", "faqs", "careers", "team"],
-      globals: ["site-settings", "home-hero", "home-process", "home-capabilities", "home-sections", "appearance"],
+      globals: ["site-settings", "home-page", "appearance"],
       breakpoints: [
         { label: "Mobile", name: "mobile", width: 390, height: 844 },
         { label: "Tablet", name: "tablet", width: 768, height: 1024 },
@@ -66,7 +76,7 @@ export default buildConfig({
     },
   },
   collections: [Services, Projects, CaseStudies, Faqs, Careers, Team, Media, Users],
-  globals: [SiteSettings, HomeHero, HomeProcess, HomeCapabilities, HomeSections, Appearance],
+  globals: [SiteSettings, HomePage, ...legacyHomeGlobals, Appearance],
   plugins: [
     cloudStoragePlugin({
       collections: {

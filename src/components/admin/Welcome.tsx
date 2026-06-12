@@ -21,12 +21,9 @@ type Group = { heading: string; blurb: string; cards: Card[] };
 const groups: Group[] = [
   {
     heading: "🏠 Home page",
-    blurb: "Everything on your front page — click Edit to change text, images, colours, buttons and more.",
+    blurb: "Your whole front page is edited visually: click any text on the page and type, drag sections to reorder, add new sections, hide or delete them.",
     cards: [
-      { icon: "✨", title: "Hero", desc: "Headline, buttons, background & stats", edit: "/admin/globals/home-hero", view: "/?edit=1" },
-      { icon: "🧩", title: "What we do", desc: "Capability panels, text & images", edit: "/admin/globals/home-capabilities", view: "/?edit=1#explore" },
-      { icon: "🪜", title: "Process", desc: "The 'how we work' steps", edit: "/admin/globals/home-process", view: "/?edit=1" },
-      { icon: "📊", title: "Sections, stats & CTA", desc: "Section titles, the number stats & call-to-action", edit: "/admin/globals/home-sections", view: "/?edit=1" },
+      { icon: "🎨", title: "Visual Editor", desc: "Click anything on the page to edit it — Shopify-style. Add, move, hide & remove sections.", edit: "/editor", view: "/" },
     ],
   },
   {
@@ -90,14 +87,15 @@ export function Welcome() {
           </div>
           <h2 style={{ margin: "0.4rem 0 0", fontSize: "1.6rem" }}>Manage your entire website 👋</h2>
           <p style={{ margin: "0.5rem 0 0", color: "var(--theme-elevation-650)", lineHeight: 1.5 }}>
-            Every word, image, colour and section is editable. Pick an area below, or open your
-            live site in <strong>Edit mode</strong> and click the pencil on any section to jump
-            straight to it. Changes appear on the real site automatically.
+            Every word, image, colour and section is editable. Open the <strong>Visual
+            Editor</strong> to edit the home page exactly like a website builder: click any text
+            and type, drag sections around, add or remove sections. Changes appear on the real
+            site automatically.
           </p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-          <a href="/?edit=1" target="_blank" rel="noreferrer" style={{ ...btn(ACCENT, "#06222a"), padding: "0.7rem 1.1rem", fontSize: "0.9rem" }}>
-            🖊️ Edit live site
+          <a href="/editor" style={{ ...btn(ACCENT, "#06222a"), padding: "0.7rem 1.1rem", fontSize: "0.9rem" }}>
+            🎨 Open Visual Editor
           </a>
           <a href="/" target="_blank" rel="noreferrer" style={{ ...btn("var(--theme-elevation-0)", "var(--theme-text)"), border: "1px solid var(--theme-elevation-150)", padding: "0.7rem 1.1rem", fontSize: "0.9rem" }}>
             👁️ View website

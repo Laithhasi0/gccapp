@@ -11,6 +11,7 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { EditPencil } from "@/components/edit/EditPencil";
 import { useEditMode, useEditReady } from "@/components/edit/EditProvider";
+import { EditableText } from "@/components/edit/EditableText";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { Project } from "@/content/types";
 import type { Heading } from "@/lib/cms";
@@ -91,7 +92,7 @@ function Panels({ projects }: { projects: Project[] }) {
  * smooth scrolling in SmoothScroll.tsx). On touch / reduced-motion it degrades
  * to a normal horizontal swipe carousel.
  */
-export function HorizontalShowcase({ projects, heading }: { projects: Project[]; heading?: Heading }) {
+export function HorizontalShowcase({ projects, heading, editPath }: { projects: Project[]; heading?: Heading; editPath?: string }) {
   const section = useRef<HTMLElement>(null);
   const pin = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
@@ -138,13 +139,15 @@ export function HorizontalShowcase({ projects, heading }: { projects: Project[];
     };
   }, [ready, reduce, projects.length]);
 
+  const text = (field: string, value: string) =>
+    editPath ? <EditableText path={`${editPath}.${field}`} value={value} /> : value;
   const Heading = (
     <Container className="shrink-0">
       <span className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">
-        {heading?.eyebrow ?? "Selected work"}
+        {text("eyebrow", heading?.eyebrow ?? "Selected work")}
       </span>
       <h2 className="mt-2 max-w-2xl">
-        {heading?.title ?? "Projects we're proud of"}
+        {text("title", heading?.title ?? "Projects we're proud of")}
       </h2>
     </Container>
   );

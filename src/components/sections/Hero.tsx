@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 import { HeroVisual } from "@/components/three/HeroVisual";
+import { EditableText } from "@/components/edit/EditableText";
 import type { HeroData } from "@/lib/cms";
 
 /**
@@ -14,7 +15,14 @@ import type { HeroData } from "@/lib/cms";
  * is a no-op and just renders `initialData`; inside the Payload live-preview
  * iframe it updates the hero AS YOU TYPE.
  */
-export function Hero({ initialData }: { initialData: HeroData }) {
+export function Hero({
+  initialData,
+  editPath,
+}: {
+  initialData: HeroData;
+  /** Visual Editor path prefix (e.g. "sections.0") — makes the text inline-editable. */
+  editPath?: string;
+}) {
   const { data } = useLivePreview<HeroData>({
     initialData,
     serverURL: typeof window !== "undefined" ? window.location.origin : "",
@@ -24,6 +32,8 @@ export function Hero({ initialData }: { initialData: HeroData }) {
   // is actually the hero (so editing another global doesn't blank the hero).
   const hero =
     data && "headline" in (data as Record<string, unknown>) ? data : initialData;
+  const text = (field: string, value?: string | null) =>
+    editPath ? <EditableText path={`${editPath}.${field}`} value={value} /> : value;
 
   return (
     <section className="relative overflow-hidden">
@@ -40,25 +50,25 @@ export function Hero({ initialData }: { initialData: HeroData }) {
             <Reveal>
               <span className="glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-accent shadow-sm">
                 <Sparkles className="h-3.5 w-3.5" />
-                {hero.badge}
+                {text("badge", hero.badge)}
               </span>
             </Reveal>
           )}
           <Reveal delay={0.08}>
             <h1 className="mt-7 text-balance">
-              {hero.headline}{" "}
+              {text("headline", hero.headline)}{" "}
               {hero.highlight && (
-                <span className="text-gradient">{hero.highlight}</span>
+                <span className="text-gradient">{text("highlight", hero.highlight)}</span>
               )}
             </h1>
           </Reveal>
           <Reveal delay={0.16}>
-            <p className="mx-auto mt-6 max-w-xl text-lg">{hero.subheading}</p>
+            <p className="mx-auto mt-6 max-w-xl text-lg">{text("subheading", hero.subheading)}</p>
           </Reveal>
           <Reveal delay={0.24}>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
               <Button href={hero.primaryCta.href} size="lg" className="group">
-                {hero.primaryCta.label}
+                {text("primaryCta.label", hero.primaryCta.label)}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
               <Button
@@ -67,7 +77,7 @@ export function Hero({ initialData }: { initialData: HeroData }) {
                 size="lg"
                 className="glass"
               >
-                {hero.secondaryCta.label}
+                {text("secondaryCta.label", hero.secondaryCta.label)}
               </Button>
             </div>
           </Reveal>
@@ -79,10 +89,10 @@ export function Hero({ initialData }: { initialData: HeroData }) {
                 {hero.stats.map((s, i) => (
                   <div key={`${s.label}-${i}`} className="glass px-3 py-4">
                     <div className="font-display text-xl font-semibold text-accent">
-                      {s.value}
+                      {text(`stats.${i}.value`, s.value)}
                     </div>
                     <div className="mt-0.5 text-[0.7rem] leading-tight text-muted">
-                      {s.label}
+                      {text(`stats.${i}.label`, s.label)}
                     </div>
                   </div>
                 ))}

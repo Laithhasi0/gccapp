@@ -12,7 +12,7 @@ import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { CaseStudy } from "@/content/types";
 import type { Heading } from "@/lib/cms";
 
-export function CaseStudiesTabs({ studies, heading }: { studies: CaseStudy[]; heading?: Heading }) {
+export function CaseStudiesTabs({ studies, heading, editPath }: { studies: CaseStudy[]; heading?: Heading; editPath?: string }) {
   const { t } = useI18n();
   const [active, setActive] = useState(0);
   const caseStudies = studies;
@@ -27,6 +27,7 @@ export function CaseStudiesTabs({ studies, heading }: { studies: CaseStudy[]; he
           eyebrow={heading?.eyebrow ?? "Case studies"}
           title={heading?.title ?? "Results that speak for themselves"}
           description={heading?.description ?? "A closer look at how we approach real problems — and the outcomes we deliver."}
+          editPath={editPath}
         />
 
         <div className="mt-12 flex flex-wrap justify-center gap-2">

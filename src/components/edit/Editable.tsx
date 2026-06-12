@@ -1,6 +1,6 @@
 "use client";
 
-import { useEditMode } from "./EditProvider";
+import { useEditMode, useVE } from "./EditProvider";
 
 /**
  * Wraps a section so that, in edit mode, hovering shows an outline and a pencil
@@ -24,12 +24,15 @@ export function Editable({
   className?: string;
 }) {
   const edit = useEditMode();
+  const ve = useVE().active;
+  // Inside the Visual Editor preview the pencil UI is suppressed.
+  const showPencil = edit && !ve;
   return (
     <div
-      className={edit ? `group/edit relative ${className}` : ""}
-      style={edit ? undefined : { display: "contents" }}
+      className={showPencil ? `group/edit relative ${className}` : ""}
+      style={showPencil ? undefined : { display: "contents" }}
     >
-      {edit && (
+      {showPencil && (
         <>
           <div className="pointer-events-none absolute inset-0 z-30 rounded-[var(--radius-lg)] ring-2 ring-accent/0 transition-[box-shadow] duration-200 group-hover/edit:ring-accent/70" />
           <a

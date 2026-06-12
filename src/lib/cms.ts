@@ -237,8 +237,8 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   };
 }
 
-export async function getHero(): Promise<HeroData> {
-  const locale = await getLocale();
+export async function getHero(forLocale?: Locale): Promise<HeroData> {
+  const locale = forLocale ?? (await getLocale());
   const ar = isAr(locale);
   const g = await findGlobal<Record<string, unknown>>("home-hero", locale);
   const p = (g?.primaryCta as { label?: string; href?: string }) || {};
@@ -354,8 +354,8 @@ export type ProcessData = {
   steps: ProcessStep[];
 };
 
-export async function getProcess(): Promise<ProcessData> {
-  const locale = await getLocale();
+export async function getProcess(forLocale?: Locale): Promise<ProcessData> {
+  const locale = forLocale ?? (await getLocale());
   const ar = isAr(locale);
   const g = await findGlobal<Record<string, unknown>>("home-process", locale);
   const steps = (g?.steps as ProcessStep[]) || [];
@@ -422,8 +422,8 @@ const arHomeSections: HomeSectionsData = {
   },
 };
 
-export async function getHomeSections(): Promise<HomeSectionsData> {
-  const locale = await getLocale();
+export async function getHomeSections(forLocale?: Locale): Promise<HomeSectionsData> {
+  const locale = forLocale ?? (await getLocale());
   const base = isAr(locale) ? arHomeSections : seedHomeSections;
   const g = await findGlobal<Record<string, unknown>>("home-sections", locale);
   if (!g) return base;
@@ -470,8 +470,8 @@ const arCapabilities: CapabilityItem[] = seedCapabilities.map((c, i) => ({
   text: capabilitiesAr.items[i]?.text ?? c.text,
 }));
 
-export async function getCapabilities(): Promise<{ eyebrow: string; items: CapabilityItem[] }> {
-  const locale = await getLocale();
+export async function getCapabilities(forLocale?: Locale): Promise<{ eyebrow: string; items: CapabilityItem[] }> {
+  const locale = forLocale ?? (await getLocale());
   const ar = isAr(locale);
   const g = await findGlobal<Record<string, unknown>>("home-capabilities", locale);
   const rawItems = (g?.items as Array<Record<string, unknown>>) || [];

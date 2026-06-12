@@ -9,7 +9,7 @@ import { getUI } from "@/lib/i18n";
 import type { Heading } from "@/lib/cms";
 
 /** Home-page variant: featured people + "Meet the team" link. */
-export async function FeaturedTeam({ heading }: { heading?: Heading }) {
+export async function FeaturedTeam({ heading, editPath }: { heading?: Heading; editPath?: string }) {
   const members = await getFeaturedTeam(4);
   if (!members.length) return null;
   const t = getUI(await getLocale());
@@ -21,6 +21,7 @@ export async function FeaturedTeam({ heading }: { heading?: Heading }) {
           eyebrow={heading?.eyebrow ?? "Our people"}
           title={heading?.title ?? "The team behind the work"}
           description={heading?.description ?? "A senior, close-knit team of designers, engineers and strategists."}
+          editPath={editPath}
         />
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {members.map((member, i) => (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEditMode } from "./EditProvider";
+import { useEditMode, useVE } from "./EditProvider";
 
 /**
  * Standalone pencil button for components that already manage their own
@@ -17,7 +17,8 @@ export function EditPencil({
   className?: string;
 }) {
   const edit = useEditMode();
-  if (!edit) return null;
+  const ve = useVE().active;
+  if (!edit || ve) return null;
   return (
     <a
       href={href}
