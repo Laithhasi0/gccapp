@@ -1,0 +1,45 @@
+This project (Next.js 16 + Payload CMS 3 + Postgres) just got a new Shopify-style
+Visual Editor for the home page. The code is complete and tested. Please set it up
+so everything works and is stored on Replit:
+
+CONTEXT — WHAT WAS ADDED
+- /editor — a visual editor (admin-only): live iframe preview of the home page,
+  section list sidebar (drag to reorder, add/duplicate/hide/delete), click any
+  section in the preview to select it, click any text to edit it inline, device
+  preview (desktop/tablet/mobile), AR/EN toggle, autosave + undo/redo.
+- New Payload global "home-page" (src/globals/HomePage.ts): the home page is now a
+  blocks array of sections. The old home-* globals are hidden from the admin nav but
+  still seed the editor's first save (automatic migration in src/lib/homePage.ts).
+- API: src/app/api/editor/home/route.ts (GET/POST, requires a logged-in CMS user).
+- Front end renders sections via src/components/home/HomeRenderer.tsx.
+
+TASKS
+1. Install dependencies and start the app. Accept Payload's dev schema push so the
+   new home_page tables are created. Afterwards verify Careers, FAQs, Site Settings
+   and the home page content are intact in BOTH languages — if any localized text
+   was lost by the column moves, re-enter or re-seed it.
+
+2. Make storage fully Replit-hosted:
+   - Use the Replit Postgres database via DATABASE_URI/DATABASE_URL (real data).
+   - Create a Replit Object Storage bucket and set OBJECT_STORAGE_ENABLED=true so
+     media uploads go to the bucket (adapter already exists in
+     src/lib/objectStorage.ts; postgres storage is the fallback).
+   - Ensure PAYLOAD_SECRET and NEXT_PUBLIC_SITE_URL are set correctly.
+
+3. VERIFY END TO END (in both Arabic and English):
+   - /admin Control Center shows "Open Visual Editor" → /editor loads with the real site.
+   - Click text in the preview and type → status shows "Saved" and the change appears
+     on the public home page.
+   - Drag to reorder, hide, duplicate, delete, and add "Custom text" and
+     "Image & text" sections → all persist after refresh.
+   - In section settings: edit fields, add/remove rows (process steps, hero stats),
+     and upload/pick an image via the media picker → uploads must land in Replit
+     Object Storage and render on the site.
+   - Undo (Cmd+Z) works; the AR/EN toggle edits each language separately; the public
+     site renders correctly in both (Arabic RTL default).
+   - The rest of the site (services, portfolio, case studies, about, faq, careers,
+     contact) still works unchanged.
+
+4. Do not delete or overwrite existing production content. The editor's first save
+   migrates the current home page automatically — confirm the home page looks
+   IDENTICAL before and after that first save.
