@@ -32,3 +32,10 @@ repl's default bucket.
   (`max: 2`, `idleTimeoutMillis`, `allowExitOnIdle`) so Autoscale multi-instance doesn't
   exhaust DB connections.
 - Switching adapters does not migrate existing files between backends.
+- The "Import website content" seeder (`/api/editor/seed` → `importWebsiteContent`) only
+  fills EMPTY collections (idempotent — skips populated ones). So enable Object Storage
+  (create bucket + `OBJECT_STORAGE_ENABLED=true`) BEFORE the first import. If you import
+  under the Postgres adapter and switch to Object Storage afterward, the already-imported
+  media 404s (adapters don't migrate) and re-import is skipped until you delete the seeded
+  media + content rows. Stored media URLs include `?prefix=media` — fetching the bare
+  `/api/media/file/<name>` 404s; the query string is required.
