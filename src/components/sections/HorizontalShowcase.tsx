@@ -11,6 +11,7 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { useEditMode, useEditReady } from "@/components/edit/EditProvider";
 import { EditableText } from "@/components/edit/EditableText";
+import { ItemPencil } from "@/components/edit/ItemPencil";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { Project } from "@/content/types";
 import type { Heading } from "@/lib/cms";
@@ -33,6 +34,7 @@ function ProjectPanel({ project }: { project: Project }) {
         <span className="absolute left-4 top-4">
           <Badge className="glass">{t.categories[project.category] ?? project.category}</Badge>
         </span>
+        <ItemPencil collection="projects" id={project.id} label={project.title} className="end-2 top-2" />
       </div>
       <div className="flex flex-1 flex-col p-6">
         <div className="flex items-start justify-between gap-3">

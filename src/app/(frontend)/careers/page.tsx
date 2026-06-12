@@ -3,6 +3,7 @@ import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
 import { CareerForm } from "@/components/forms/CareerForm";
+import { ItemPencil } from "@/components/edit/ItemPencil";
 import { Editable } from "@/components/edit/Editable";
 import { MapPin, Briefcase } from "lucide-react";
 import { getCareers } from "@/lib/cms";
@@ -33,7 +34,8 @@ export default async function CareersPage() {
           <div className="mx-auto mt-14 max-w-3xl space-y-4">
           {careers.map((c, i) => (
             <Reveal key={c.slug} delay={i * 0.05}>
-              <div className="hover-lift rounded-[var(--radius-lg)] border border-border bg-surface p-6 shadow-sm">
+              <div className="hover-lift relative rounded-[var(--radius-lg)] border border-border bg-surface p-6 shadow-sm">
+                <ItemPencil collection="careers" id={c.id} label={c.role} className="end-2 bottom-2" />
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <h3 className="text-lg">{c.role}</h3>
                   <div className="flex flex-wrap gap-3 text-xs text-muted">

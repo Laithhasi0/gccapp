@@ -1,4 +1,6 @@
 export type Career = {
+  /** CMS document id (present when loaded from the dashboard). */
+  id?: number | string;
   slug: string;
   role: string;
   location: string;

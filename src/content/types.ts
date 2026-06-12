@@ -14,6 +14,8 @@ export type NavItem = {
 };
 
 export type Service = {
+  /** CMS document id (present when loaded from the dashboard). */
+  id?: number | string;
   slug: string;
   title: string;
   icon: LucideIcon;
@@ -25,6 +27,8 @@ export type Service = {
 };
 
 export type Project = {
+  /** CMS document id (present when loaded from the dashboard). */
+  id?: number | string;
   slug: string;
   title: string;
   category: string;
@@ -47,6 +51,8 @@ export type Project = {
 };
 
 export type CaseStudy = {
+  /** CMS document id (present when loaded from the dashboard). */
+  id?: number | string;
   slug: string;
   title: string;
   category: string;
@@ -66,6 +72,8 @@ export type TeamSocials = {
 };
 
 export type TeamMember = {
+  /** CMS document id (present when loaded from the dashboard). */
+  id?: number | string;
   name: string;
   role: string;
   /** Short "currently working on" line. */
@@ -86,6 +94,8 @@ export type TeamMember = {
 };
 
 export type Faq = {
+  /** CMS document id (present when loaded from the dashboard). */
+  id?: number | string;
   question: string;
   answer: string;
   category: string;

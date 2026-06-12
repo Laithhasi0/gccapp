@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 /**
  * Editing modes for the live site.
@@ -42,15 +42,20 @@ export function vePost(msg: Record<string, unknown>) {
 }
 
 const KEY = "gcc_edit_mode";
+const KEY_VE = "gcc_ve";
 
 export function EditProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<EditState>({ edit: false, ready: false });
   const [ve, setVe] = useState<VEState>({ active: false, selected: null });
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const isVe = params.get("ve") === "1" && window.parent !== window;
+    const inIframe = window.parent !== window;
+    // VE mode survives in-preview navigation (detail pages) via sessionStorage.
+    const isVe = inIframe && (params.get("ve") === "1" || sessionStorage.getItem(KEY_VE) === "1");
+    if (isVe) sessionStorage.setItem(KEY_VE, "1");
     const fromUrl = params.get("edit") === "1" || isVe;
     const stored = sessionStorage.getItem(KEY) === "1";
     if (fromUrl && !isVe) sessionStorage.setItem(KEY, "1");
@@ -59,6 +64,12 @@ export function EditProvider({ children }: { children: React.ReactNode }) {
     setState({ edit: fromUrl || stored, ready: true });
     if (isVe) setVe({ active: true, selected: null });
   }, []);
+
+  // Tell the editor which page the preview is on (page switcher stays in sync
+  // when the user clicks into a project / service / case study).
+  useEffect(() => {
+    if (ve.active) vePost({ type: "navigated", path: pathname });
+  }, [ve.active, pathname]);
 
   // Visual Editor wiring: receive commands from the parent editor window and
   // block real navigation/submission inside the preview.
@@ -80,11 +91,19 @@ export function EditProvider({ children }: { children: React.ReactNode }) {
       if (msg.type === "refresh") router.refresh();
     };
 
-    // Keep the admin inside the editor: clicking links in the preview must not
-    // navigate away, and forms must not submit.
+    // Navigation rules inside the preview: the home page is a visual canvas
+    // (clicks select sections, so links are inert there); on other pages the
+    // user can browse into detail pages — but never leave the site or open
+    // new tabs, and forms never really submit.
     const onClick = (e: MouseEvent) => {
       const a = (e.target as Element)?.closest?.("a");
-      if (a && !a.closest("[data-ve-allow]")) e.preventDefault();
+      if (!a || a.closest("[data-ve-allow]")) return;
+      if (window.location.pathname === "/") {
+        e.preventDefault();
+        return;
+      }
+      const url = new URL(a.href, window.location.href);
+      if (url.origin !== window.location.origin || a.target === "_blank") e.preventDefault();
     };
     const onSubmit = (e: Event) => e.preventDefault();
 

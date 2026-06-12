@@ -38,6 +38,18 @@ const brand: PageSource[] = [
   },
 ];
 
+/**
+ * Resolves any preview path (including detail pages like /portfolio/my-app)
+ * to its closest editor page, so the sidebar always shows useful shortcuts.
+ */
+export function pageForPath(path: string): EditorPage {
+  const exact = EDITOR_PAGES.find((p) => p.path === path);
+  if (exact) return exact;
+  const prefix = EDITOR_PAGES.find((p) => p.path !== "/" && path.startsWith(`${p.path}/`));
+  if (prefix) return { ...prefix, path, visual: false };
+  return { path, label: path, icon: "📄", sources: brand };
+}
+
 export const EDITOR_PAGES: EditorPage[] = [
   { path: "/", label: "Home", icon: "🏠", visual: true, sources: [] },
   {

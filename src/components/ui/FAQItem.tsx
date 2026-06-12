@@ -3,6 +3,7 @@
 import { useState, useId } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Plus } from "lucide-react";
+import { ItemPencil } from "@/components/edit/ItemPencil";
 import type { Faq } from "@/content/types";
 
 export function FAQItem({ faq }: { faq: Faq }) {
@@ -11,7 +12,8 @@ export function FAQItem({ faq }: { faq: Faq }) {
   const reduce = useReducedMotion();
 
   return (
-    <div className="border-b border-border">
+    <div className="relative border-b border-border">
+      <ItemPencil collection="faqs" id={faq.id} label={faq.question} className="end-10 top-5" />
       <h3>
         <button
           type="button"

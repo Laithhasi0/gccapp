@@ -7,6 +7,7 @@ export const Team: CollectionConfig = {
   admin: {
     useAsTitle: "name",
     group: "Content",
+    description: "The people shown on /about and the home page. No photo? A clean initials avatar is used.",
     defaultColumns: ["name", "role", "department", "featured", "order"],
     listSearchableFields: ["name", "role", "workingOn"],
   },
@@ -43,8 +44,7 @@ export const Team: CollectionConfig = {
       name: "photo",
       type: "upload",
       relationTo: "media",
-      required: true,
-      admin: { description: "Square photo works best (auto-cropped)." },
+      admin: { description: "Square photo works best (auto-cropped). Leave empty to show initials." },
     },
     {
       name: "department",
@@ -74,21 +74,17 @@ export const Team: CollectionConfig = {
       ],
     },
     {
-      type: "row",
-      fields: [
-        {
-          name: "order",
-          type: "number",
-          defaultValue: 0,
-          admin: { description: "Lower numbers appear first." },
-        },
-        {
-          name: "featured",
-          type: "checkbox",
-          defaultValue: false,
-          label: "Feature on home page",
-        },
-      ],
+      name: "order",
+      type: "number",
+      defaultValue: 0,
+      admin: { position: "sidebar", description: "Lower numbers appear first." },
+    },
+    {
+      name: "featured",
+      type: "checkbox",
+      defaultValue: false,
+      label: "Feature on home page",
+      admin: { position: "sidebar" },
     },
   ],
 };

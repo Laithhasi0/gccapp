@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Mail } from "lucide-react";
 import { SocialIcon } from "@/components/ui/SocialIcon";
+import { ItemPencil } from "@/components/edit/ItemPencil";
 import type { TeamMember } from "@/content/types";
 
 function Socials({ member }: { member: TeamMember }) {
@@ -41,6 +42,7 @@ export function TeamCard({ member }: { member: TeamMember }) {
     >
       {/* Square photo / initials avatar */}
       <div className="relative aspect-square w-full overflow-hidden bg-accent-soft">
+        <ItemPencil collection="team" id={member.id} label={member.name} />
         {member.photo ? (
           <Image
             src={member.photo}

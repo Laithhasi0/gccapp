@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { getLocale } from "@/lib/getLocale";
+import { ItemPencil } from "@/components/edit/ItemPencil";
 import { getUI } from "@/lib/i18n";
 import type { Service } from "@/content/types";
 
@@ -23,6 +24,7 @@ export async function ServiceCard({ service }: { service: Service }) {
           className="object-cover transition-transform duration-700 ease-soft group-hover:scale-[1.05]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/10 to-transparent" />
+        <ItemPencil collection="services" id={service.id} label={service.title} />
         {/* Cyan icon chip overlapping the image */}
         <span className="absolute -bottom-5 left-6 inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] bg-accent text-accent-contrast shadow">
           <Icon className="h-5 w-5" strokeWidth={1.75} />

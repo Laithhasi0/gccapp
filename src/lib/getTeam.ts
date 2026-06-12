@@ -13,6 +13,7 @@ type MediaDoc = {
 };
 
 type TeamDoc = {
+  id?: number | string;
   name: string;
   role: string;
   workingOn?: string | null;
@@ -40,6 +41,7 @@ function mapDoc(doc: TeamDoc): TeamMember {
   const photo = doc.photo && typeof doc.photo === "object" ? doc.photo : null;
   const photoUrl = photo?.sizes?.square?.url || photo?.url || undefined;
   return {
+    id: doc.id,
     name: doc.name,
     role: doc.role,
     workingOn: doc.workingOn || undefined,

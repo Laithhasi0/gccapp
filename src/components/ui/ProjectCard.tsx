@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { useI18n } from "@/components/i18n/LocaleProvider";
+import { ItemPencil } from "@/components/edit/ItemPencil";
 import type { Project } from "@/content/types";
 
 export function ProjectCard({ project }: { project: Project }) {
@@ -21,6 +22,7 @@ export function ProjectCard({ project }: { project: Project }) {
           sizes="(max-width: 768px) 100vw, 33vw"
           className="object-cover transition-transform duration-700 ease-soft group-hover:scale-[1.05]"
         />
+        <ItemPencil collection="projects" id={project.id} label={project.title} className="end-2 top-2" />
         {/* Category badge */}
         <span className="absolute left-4 top-4 rounded-full bg-surface/90 px-3 py-1 text-xs font-medium text-accent backdrop-blur-sm">
           {t.categories[project.category] ?? project.category}

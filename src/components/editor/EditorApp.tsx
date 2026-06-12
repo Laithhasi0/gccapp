@@ -18,7 +18,7 @@ import {
 import { blockDef, isLocalizedField, type HomeSection } from "@/lib/homeBlocks";
 import { isLocale, LOCALE_COOKIE, type Locale } from "@/lib/i18n";
 import { getDeep, graftIds, newRowId, setDeep } from "./deep";
-import { EDITOR_PAGES } from "./pages";
+import { EDITOR_PAGES, pageForPath } from "./pages";
 import { PageInfoPanel } from "./PageInfoPanel";
 import { SectionListPanel } from "./SectionListPanel";
 import { SettingsPanel, type ArrayOp, type FieldScope } from "./SettingsPanel";
@@ -61,6 +61,7 @@ export function EditorApp() {
   const [trees, _setTrees] = useState<Trees | null>(null);
   const [previewLocale, setPreviewLocale] = useState<Locale>("ar");
   const [page, setPage] = useState("/");
+  const [iframeSrc, setIframeSrc] = useState("/");
   const [selected, setSelected] = useState<number | null>(null);
   const [adding, setAdding] = useState(false);
   const [device, setDevice] = useState<Device>("desktop");
@@ -389,8 +390,20 @@ export function EditorApp() {
   const switchPage = useCallback(
     (path: string) => {
       setPage(path);
+      setIframeSrc(path);
       selectSection(null);
       setIframeKey((k) => k + 1);
+    },
+    [selectSection],
+  );
+
+  /** Preview navigated by itself (user clicked into a detail page). */
+  const onNavigated = useCallback(
+    (path: string) => {
+      setPage((prev) => {
+        if (prev !== path) selectSection(null);
+        return path;
+      });
     },
     [selectSection],
   );
@@ -426,6 +439,8 @@ export function EditorApp() {
       if (!msg || msg.ns !== VE_NS) return;
       if (msg.type === "ready") {
         postToIframe({ type: "select", index: selectedRef.current });
+      } else if (msg.type === "navigated" && typeof msg.path === "string") {
+        onNavigated(msg.path);
       } else if (msg.type === "open-admin" && msg.href) {
         window.open(msg.href, "_blank");
       } else if (msg.type === "select-section" && typeof msg.index === "number") {
@@ -452,7 +467,7 @@ export function EditorApp() {
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [commit, handleAction, postToIframe, selectSection]);
+  }, [commit, handleAction, onNavigated, postToIframe, selectSection]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -478,8 +493,9 @@ export function EditorApp() {
 
   /* ---------------------------------- UI ---------------------------------- */
 
-  const currentPage = EDITOR_PAGES.find((p) => p.path === page) ?? EDITOR_PAGES[0];
-  const isHome = currentPage.visual === true;
+  const currentPage = pageForPath(page);
+  const isHome = currentPage.visual === true && page === "/";
+  const knownPage = EDITOR_PAGES.some((p) => p.path === page);
   const sectionAr = selected != null && trees ? trees.ar[selected] : null;
   const sectionEn = selected != null && trees ? trees.en[selected] : null;
 
@@ -508,6 +524,11 @@ export function EditorApp() {
               {p.icon} {p.label}
             </option>
           ))}
+          {!knownPage && (
+            <option value={page}>
+              {currentPage.icon} {page}
+            </option>
+          )}
         </select>
 
         {/* Device toggle */}
@@ -659,10 +680,10 @@ export function EditorApp() {
               </div>
             ) : (
               <iframe
-                key={`${iframeKey}-${page}`}
+                key={`${iframeKey}-${iframeSrc}`}
                 ref={iframeRef}
                 title="Live preview"
-                src={`${page}?ve=1`}
+                src={`${iframeSrc}?ve=1`}
                 className="h-full w-full rounded-xl border border-zinc-800 bg-black"
               />
             )}

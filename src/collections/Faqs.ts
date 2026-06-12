@@ -16,17 +16,17 @@ export const Faqs: CollectionConfig = {
     { name: "question", type: "text", required: true, localized: true },
     { name: "answer", type: "textarea", required: true, localized: true },
     {
-      type: "row",
-      fields: [
-        {
-          name: "category",
-          type: "text",
-          required: true,
-          localized: true,
-          admin: { description: "Groups FAQs, e.g. Pricing, Process." },
-        },
-        { name: "order", type: "number", defaultValue: 0 },
-      ],
+      name: "category",
+      type: "text",
+      required: true,
+      localized: true,
+      admin: { description: "Groups FAQs on the page, e.g. Pricing, Process." },
+    },
+    {
+      name: "order",
+      type: "number",
+      defaultValue: 0,
+      admin: { position: "sidebar", description: "Lower numbers appear first." },
     },
   ],
 };

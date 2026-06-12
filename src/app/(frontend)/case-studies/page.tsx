@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Badge } from "@/components/ui/Badge";
 import { Reveal } from "@/components/motion/Reveal";
 import { CTASection } from "@/components/ui/CTASection";
+import { ItemPencil } from "@/components/edit/ItemPencil";
 import { Editable } from "@/components/edit/Editable";
 import { ArrowRight } from "lucide-react";
 import { getCaseStudies } from "@/lib/cms";
@@ -40,6 +41,7 @@ export default async function CaseStudiesPage() {
                 className="hover-lift group grid items-center gap-8 overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface p-6 shadow-sm lg:grid-cols-2 lg:p-8"
               >
                 <div className="relative aspect-[16/10] overflow-hidden rounded-[var(--radius)] bg-surface-tint">
+                  <ItemPencil collection="case-studies" id={c.id} label={c.title} />
                   <Image
                     src={c.cover}
                     alt={c.title}

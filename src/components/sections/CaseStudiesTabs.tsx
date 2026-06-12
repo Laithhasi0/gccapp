@@ -8,6 +8,7 @@ import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useI18n } from "@/components/i18n/LocaleProvider";
+import { ItemPencil } from "@/components/edit/ItemPencil";
 import type { CaseStudy } from "@/content/types";
 import type { Heading } from "@/lib/cms";
 
@@ -52,8 +53,9 @@ export function CaseStudiesTabs({ studies, heading, editPath }: { studies: CaseS
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-10 grid items-center gap-10 rounded-[var(--radius-lg)] border border-border bg-background p-6 shadow-sm lg:grid-cols-2 lg:p-10"
+            className="relative mt-10 grid items-center gap-10 rounded-[var(--radius-lg)] border border-border bg-background p-6 shadow-sm lg:grid-cols-2 lg:p-10"
           >
+            <ItemPencil collection="case-studies" id={study.id} label={study.title} className="end-3 top-3" />
             <div className="relative aspect-[16/10] overflow-hidden rounded-[var(--radius)] bg-surface-tint">
               <Image
                 src={study.cover}
@@ -67,8 +69,8 @@ export function CaseStudiesTabs({ studies, heading, editPath }: { studies: CaseS
               <h3 className="text-2xl">{study.title}</h3>
               <p className="mt-3">{study.summary}</p>
               <div className="mt-6 grid grid-cols-3 gap-4">
-                {study.metrics.map((m) => (
-                  <div key={m.label}>
+                {study.metrics.map((m, mi) => (
+                  <div key={`${m.label}-${mi}`}>
                     <div className="font-display text-2xl font-semibold text-accent">
                       {m.value}
                     </div>

@@ -5,6 +5,8 @@
  * click-to-edit experience. Rendered via `admin.components.beforeDashboard`.
  */
 
+import { SeedButton } from "./SeedButton";
+
 const ACCENT = "#25c9e2";
 
 type Card = {
@@ -20,10 +22,10 @@ type Group = { heading: string; blurb: string; cards: Card[] };
 
 const groups: Group[] = [
   {
-    heading: "🏠 Home page",
-    blurb: "Your whole front page is edited visually: click any text on the page and type, drag sections to reorder, add new sections, hide or delete them.",
+    heading: "🎨 Edit your website",
+    blurb: "Everything is edited visually: pick a page, click any text or image, and type. Drag sections to reorder, add new sections, hide or delete them — separately in Arabic and English.",
     cards: [
-      { icon: "🎨", title: "Visual Editor", desc: "Click anything on the page to edit it — Shopify-style. Add, move, hide & remove sections.", edit: "/editor", view: "/" },
+      { icon: "🎨", title: "Visual Editor", desc: "Edit every page like a website builder: click anything to edit it, in Arabic & English, add / move / hide / remove sections.", edit: "/editor", view: "/" },
     ],
   },
   {
@@ -101,6 +103,32 @@ export function Welcome() {
             👁️ View website
           </a>
         </div>
+      </div>
+
+      {/* Import website content */}
+      <div
+        style={{
+          marginTop: "1rem",
+          padding: "1rem 1.25rem",
+          borderRadius: 12,
+          border: "1px dashed var(--theme-elevation-200)",
+          background: "var(--theme-elevation-0)",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "1rem",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div style={{ maxWidth: 640 }}>
+          <div style={{ fontWeight: 650, fontSize: "0.95rem" }}>🗂️ See all your website content here</div>
+          <p style={{ margin: "0.3rem 0 0", fontSize: "0.82rem", color: "var(--theme-elevation-500)", lineHeight: 1.5 }}>
+            If your projects, services, FAQ or team look empty in this dashboard, click Import:
+            it copies everything currently shown on the website (Arabic + English + images) into
+            the dashboard so you can edit it. Collections that already have content are skipped.
+          </p>
+        </div>
+        <SeedButton />
       </div>
 
       {/* Groups */}

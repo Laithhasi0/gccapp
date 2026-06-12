@@ -48,6 +48,7 @@ function originalUrl(m: MediaDoc | string | null | undefined): string | undefine
 /* ------------------------------- services -------------------------------- */
 
 type ServiceDoc = {
+  id?: number | string;
   slug: string;
   title: string;
   icon?: string;
@@ -60,6 +61,7 @@ type ServiceDoc = {
 
 function mapService(doc: ServiceDoc): Service {
   return {
+    id: doc.id,
     slug: doc.slug,
     title: doc.title,
     icon: iconFor(doc.icon),
@@ -96,6 +98,7 @@ export async function getService(slug: string): Promise<Service | undefined> {
 /* ------------------------------- projects -------------------------------- */
 
 type ProjectDoc = {
+  id?: number | string;
   slug: string;
   title: string;
   category: string;
@@ -115,6 +118,7 @@ type ProjectDoc = {
 
 function mapProject(doc: ProjectDoc): Project {
   return {
+    id: doc.id,
     slug: doc.slug,
     title: doc.title,
     category: doc.category,
@@ -301,6 +305,7 @@ async function findDocs<T>(collection: string, locale: Locale): Promise<T[] | nu
 }
 
 type CaseStudyDoc = {
+  id?: number | string;
   slug: string;
   title: string;
   category: string;
@@ -315,6 +320,7 @@ export async function getCaseStudies(): Promise<CaseStudy[]> {
   const docs = await findDocs<CaseStudyDoc>("case-studies", locale);
   if (!docs) return isAr(locale) ? caseStudiesAr : seedCaseStudies;
   return docs.map((d) => ({
+    id: d.id,
     slug: d.slug,
     title: d.title,
     category: d.category,
