@@ -7,7 +7,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { EditPencil } from "@/components/edit/EditPencil";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { CaseStudy } from "@/content/types";
 import type { Heading } from "@/lib/cms";
@@ -21,7 +20,6 @@ export function CaseStudiesTabs({ studies, heading, editPath }: { studies: CaseS
 
   return (
     <section className="relative bg-surface py-16 sm:py-20 lg:py-28">
-      <EditPencil href="/admin/globals/home-sections" label="Case studies" />
       <Container>
         <SectionHeading
           eyebrow={heading?.eyebrow ?? "Case studies"}

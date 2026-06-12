@@ -6,7 +6,7 @@ import { processSteps as seedProcessSteps } from "@/content/site";
 import { processStepsAr } from "@/content/ar";
 import { getLocale } from "./getLocale";
 import { getUI, type Locale } from "./i18n";
-import type { HomeSection, MediaRef } from "./homeBlocks";
+import { LOCALIZED_TEXT_FIELDS, type HomeSection, type MediaRef } from "./homeBlocks";
 
 /**
  * Home page data layer for the Visual Editor and the front end.
@@ -190,23 +190,8 @@ export async function getHomePage(): Promise<HomePageData> {
 
 /* --------------------------------- saving --------------------------------- */
 
-/**
- * Localized field names within blocks (see globals/HomePage.ts). Used when
- * backfilling the other locale on first save so we only overwrite translatable
- * text — never shared fields (links, values, images) the user just saved.
- */
-const LOCALIZED_FIELDS = new Set([
-  "badge",
-  "headline",
-  "highlight",
-  "subheading",
-  "eyebrow",
-  "title",
-  "description",
-  "text",
-  "label",
-  "buttonLabel",
-]);
+/** Shared with the editor: which block fields are stored per language. */
+const LOCALIZED_FIELDS = LOCALIZED_TEXT_FIELDS;
 
 function mergeLocalized(saved: unknown, defaults: unknown): unknown {
   if (Array.isArray(saved) && Array.isArray(defaults)) {

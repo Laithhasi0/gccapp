@@ -9,7 +9,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
-import { EditPencil } from "@/components/edit/EditPencil";
 import { useEditMode, useEditReady } from "@/components/edit/EditProvider";
 import { EditableText } from "@/components/edit/EditableText";
 import { useI18n } from "@/components/i18n/LocaleProvider";
@@ -156,7 +155,6 @@ export function HorizontalShowcase({ projects, heading, editPath }: { projects: 
   if (reduce) {
     return (
       <section id="work" className="relative bg-surface-tint py-16 sm:py-20">
-        <EditPencil href="/admin/globals/home-sections" label="Selected work" />
         {Heading}
         <div className="mt-8 flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 pb-4 sm:px-6 lg:px-8">
           <Panels projects={projects} />

@@ -8,7 +8,6 @@ import { ArrowRight } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Container } from "@/components/ui/Container";
-import { EditPencil } from "@/components/edit/EditPencil";
 import { useEditMode, useEditReady } from "@/components/edit/EditProvider";
 import { EditableText } from "@/components/edit/EditableText";
 import { useI18n } from "@/components/i18n/LocaleProvider";
@@ -142,7 +141,6 @@ export function CapabilitiesShowcase({
   if (reduce) {
     return (
       <section id="explore" className="relative bg-surface py-16 sm:py-20">
-        <EditPencil href="/admin/globals/home-capabilities" label="What we do" />
         <Container>
           <span className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">
             {editPath ? <EditableText path={`${editPath}.eyebrow`} value={eyebrow} /> : eyebrow}

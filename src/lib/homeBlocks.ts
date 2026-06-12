@@ -13,6 +13,29 @@
 
 export type MediaRef = { id?: number | string; url?: string } | null;
 
+/**
+ * Field names that are localized (stored per language) in the home-page
+ * blocks — see src/globals/HomePage.ts. Everything else (links, values,
+ * images, toggles) is shared between Arabic and English.
+ */
+export const LOCALIZED_TEXT_FIELDS = new Set([
+  "badge",
+  "headline",
+  "highlight",
+  "subheading",
+  "eyebrow",
+  "title",
+  "description",
+  "text",
+  "label",
+  "buttonLabel",
+]);
+
+export const isLocalizedField = (name: string): boolean => {
+  const last = name.split(".").pop() ?? name;
+  return LOCALIZED_TEXT_FIELDS.has(last);
+};
+
 export type BlockType =
   | "hero"
   | "capabilities"

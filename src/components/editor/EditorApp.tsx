@@ -15,11 +15,13 @@ import {
   TriangleAlert,
   Undo2,
 } from "lucide-react";
-import { blockDef, type HomeSection } from "@/lib/homeBlocks";
+import { blockDef, isLocalizedField, type HomeSection } from "@/lib/homeBlocks";
 import { isLocale, LOCALE_COOKIE, type Locale } from "@/lib/i18n";
-import { getDeep, newRowId, setDeep } from "./deep";
+import { getDeep, graftIds, newRowId, setDeep } from "./deep";
+import { EDITOR_PAGES } from "./pages";
+import { PageInfoPanel } from "./PageInfoPanel";
 import { SectionListPanel } from "./SectionListPanel";
-import { SettingsPanel } from "./SettingsPanel";
+import { SettingsPanel, type ArrayOp, type FieldScope } from "./SettingsPanel";
 import { AddSectionPanel } from "./AddSectionPanel";
 
 const VE_NS = "gcc-ve";
@@ -27,13 +29,18 @@ const VE_NS = "gcc-ve";
 type Status = "loading" | "saved" | "saving" | "error";
 type Device = "desktop" | "tablet" | "mobile";
 
+/** Both languages of the home page, edited together. Structure (sections,
+ * rows, order) is always identical between the two trees; only localized
+ * text differs. */
+type Trees = { ar: HomeSection[]; en: HomeSection[] };
+
 const DEVICE_WIDTH: Record<Device, string> = {
   desktop: "100%",
   tablet: "768px",
   mobile: "390px",
 };
 
-/** Strips section ids (so Payload assigns fresh ones) on duplicated rows. */
+/** Strips row ids (so Payload assigns fresh ones) on duplicated sections. */
 function withFreshIds(section: HomeSection): HomeSection {
   const strip = (v: unknown): unknown => {
     if (Array.isArray(v)) return v.map(strip);
@@ -51,8 +58,9 @@ function withFreshIds(section: HomeSection): HomeSection {
 }
 
 export function EditorApp() {
-  const [sections, _setSections] = useState<HomeSection[] | null>(null);
-  const [locale, setLocale] = useState<Locale>("ar");
+  const [trees, _setTrees] = useState<Trees | null>(null);
+  const [previewLocale, setPreviewLocale] = useState<Locale>("ar");
+  const [page, setPage] = useState("/");
   const [selected, setSelected] = useState<number | null>(null);
   const [adding, setAdding] = useState(false);
   const [device, setDevice] = useState<Device>("desktop");
@@ -62,19 +70,19 @@ export function EditorApp() {
   const [canRedo, setCanRedo] = useState(false);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const sectionsRef = useRef<HomeSection[] | null>(null);
+  const treesRef = useRef<Trees | null>(null);
   const selectedRef = useRef<number | null>(null);
-  const localeRef = useRef<Locale>("ar");
-  const historyRef = useRef<{ past: HomeSection[][]; future: HomeSection[][] }>({ past: [], future: [] });
+  const previewLocaleRef = useRef<Locale>("ar");
+  const historyRef = useRef<{ past: Trees[]; future: Trees[] }>({ past: [], future: [] });
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingRefresh = useRef(false);
   const dirtyRef = useRef(false);
   const savingRef = useRef(false);
   const coalesceRef = useRef<{ key: string; at: number } | null>(null);
 
-  const setSections = useCallback((next: HomeSection[] | null) => {
-    sectionsRef.current = next;
-    _setSections(next);
+  const setTrees = useCallback((next: Trees | null) => {
+    treesRef.current = next;
+    _setTrees(next);
   }, []);
 
   const syncHistoryFlags = useCallback(() => {
@@ -91,48 +99,52 @@ export function EditorApp() {
 
   /* ------------------------------- load/save ------------------------------ */
 
-  const load = useCallback(
-    async (loc: Locale) => {
-      setStatus("loading");
-      try {
-        const res = await fetch(`/api/editor/home?locale=${loc}`);
-        if (res.status === 401) {
-          window.location.href = "/admin/login";
-          return;
-        }
-        const data = (await res.json()) as { sections: HomeSection[] };
-        setSections(data.sections);
-        historyRef.current = { past: [], future: [] };
-        dirtyRef.current = false;
-        syncHistoryFlags();
-        setStatus("saved");
-      } catch {
-        setStatus("error");
+  const load = useCallback(async () => {
+    setStatus("loading");
+    try {
+      const [resAr, resEn] = await Promise.all([
+        fetch("/api/editor/home?locale=ar"),
+        fetch("/api/editor/home?locale=en"),
+      ]);
+      if (resAr.status === 401 || resEn.status === 401) {
+        window.location.href = "/admin/login";
+        return;
       }
-    },
-    [setSections, syncHistoryFlags],
-  );
+      const [ar, en] = await Promise.all([resAr.json(), resEn.json()]);
+      setTrees({ ar: ar.sections, en: en.sections });
+      historyRef.current = { past: [], future: [] };
+      dirtyRef.current = false;
+      syncHistoryFlags();
+      setStatus("saved");
+    } catch {
+      setStatus("error");
+    }
+  }, [setTrees, syncHistoryFlags]);
 
   const doSave = useCallback(async () => {
-    if (savingRef.current || !sectionsRef.current) return;
+    if (savingRef.current || !treesRef.current) return;
     savingRef.current = true;
     setStatus("saving");
-    const snapshot = sectionsRef.current;
+    const snapshot = treesRef.current;
     const refresh = pendingRefresh.current;
     pendingRefresh.current = false;
     try {
-      const res = await fetch("/api/editor/home", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sections: snapshot, locale: localeRef.current }),
-      });
-      if (!res.ok) throw new Error(`save failed (${res.status})`);
-      const data = (await res.json()) as { sections: HomeSection[] };
+      const post = async (sections: HomeSection[], locale: Locale) => {
+        const res = await fetch("/api/editor/home", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sections, locale }),
+        });
+        if (!res.ok) throw new Error(`save failed (${res.status})`);
+        return (await res.json()) as { sections: HomeSection[] };
+      };
+      // Save Arabic first, then graft the server-assigned row ids onto the
+      // English tree before saving it — both languages stay on the same rows.
+      const savedAr = await post(snapshot.ar, "ar");
+      const savedEn = await post(graftIds(savedAr.sections, snapshot.en), "en");
       savingRef.current = false;
-      if (sectionsRef.current === snapshot) {
-        // Adopt server-assigned row ids so future saves keep matching rows
-        // (which is what preserves the other language's translations).
-        setSections(data.sections);
+      if (treesRef.current === snapshot) {
+        setTrees({ ar: savedAr.sections, en: savedEn.sections });
         dirtyRef.current = false;
         setStatus("saved");
       } else {
@@ -146,7 +158,7 @@ export function EditorApp() {
       pendingRefresh.current = pendingRefresh.current || refresh;
       setStatus("error");
     }
-  }, [postToIframe, setSections]);
+  }, [postToIframe, setTrees]);
 
   useEffect(() => {
     doSaveRef.current = doSave;
@@ -163,9 +175,9 @@ export function EditorApp() {
    * merges rapid same-field edits into one undo step.
    */
   const commit = useCallback(
-    (next: HomeSection[], opts: { refresh?: boolean; coalesceKey?: string } = {}) => {
+    (next: Trees, opts: { refresh?: boolean; coalesceKey?: string } = {}) => {
       const { refresh = true, coalesceKey } = opts;
-      const prev = sectionsRef.current;
+      const prev = treesRef.current;
       if (prev) {
         const now = Date.now();
         const last = coalesceRef.current;
@@ -175,40 +187,50 @@ export function EditorApp() {
         historyRef.current.future = [];
         coalesceRef.current = coalesceKey ? { key: coalesceKey, at: now } : null;
       }
-      setSections(next);
+      setTrees(next);
       dirtyRef.current = true;
       if (refresh) pendingRefresh.current = true;
       syncHistoryFlags();
       scheduleSave();
     },
-    [scheduleSave, setSections, syncHistoryFlags],
+    [scheduleSave, setTrees, syncHistoryFlags],
+  );
+
+  /** Applies the same structural transform to both language trees. */
+  const commitBoth = useCallback(
+    (fn: (sections: HomeSection[]) => HomeSection[], opts?: { coalesceKey?: string }) => {
+      const t = treesRef.current;
+      if (!t) return;
+      commit({ ar: fn(t.ar), en: fn(t.en) }, opts);
+    },
+    [commit],
   );
 
   const undo = useCallback(() => {
     const { past, future } = historyRef.current;
     const prev = past.pop();
-    if (!prev || !sectionsRef.current) return;
-    future.push(sectionsRef.current);
+    if (!prev || !treesRef.current) return;
+    future.push(treesRef.current);
     coalesceRef.current = null;
-    setSections(prev);
+    setTrees(prev);
     dirtyRef.current = true;
     pendingRefresh.current = true;
     syncHistoryFlags();
     scheduleSave();
-  }, [scheduleSave, setSections, syncHistoryFlags]);
+  }, [scheduleSave, setTrees, syncHistoryFlags]);
 
   const redo = useCallback(() => {
     const { past, future } = historyRef.current;
     const next = future.pop();
-    if (!next || !sectionsRef.current) return;
-    past.push(sectionsRef.current);
+    if (!next || !treesRef.current) return;
+    past.push(treesRef.current);
     coalesceRef.current = null;
-    setSections(next);
+    setTrees(next);
     dirtyRef.current = true;
     pendingRefresh.current = true;
     syncHistoryFlags();
     scheduleSave();
-  }, [scheduleSave, setSections, syncHistoryFlags]);
+  }, [scheduleSave, setTrees, syncHistoryFlags]);
 
   /* ------------------------------- selection ------------------------------ */
 
@@ -225,50 +247,46 @@ export function EditorApp() {
 
   /* -------------------------------- actions ------------------------------- */
 
-  const moveSection = useCallback(
-    (index: number, dir: -1 | 1) => {
-      const list = sectionsRef.current;
-      if (!list) return;
-      const to = index + dir;
-      if (to < 0 || to >= list.length) return;
-      const next = list.slice();
-      const [row] = next.splice(index, 1);
-      next.splice(to, 0, row);
-      commit(next);
-      selectSection(to, { scroll: false });
-    },
-    [commit, selectSection],
-  );
-
   const reorderSection = useCallback(
     (from: number, to: number) => {
-      const list = sectionsRef.current;
-      if (!list || from === to) return;
-      const next = list.slice();
-      const [row] = next.splice(from, 1);
-      next.splice(to, 0, row);
-      commit(next);
-      selectSection(to, { scroll: false });
+      if (from === to) return;
+      commitBoth((list) => {
+        if (to < 0 || to >= list.length) return list;
+        const next = list.slice();
+        const [row] = next.splice(from, 1);
+        next.splice(to, 0, row);
+        return next;
+      });
+      const len = treesRef.current?.ar.length ?? 0;
+      if (to >= 0 && to < len) selectSection(to, { scroll: false });
     },
-    [commit, selectSection],
+    [commitBoth, selectSection],
+  );
+
+  const moveSection = useCallback(
+    (index: number, dir: -1 | 1) => reorderSection(index, index + dir),
+    [reorderSection],
   );
 
   const toggleHidden = useCallback(
     (index: number) => {
-      const list = sectionsRef.current;
-      if (!list) return;
-      commit(setDeep(list, `${index}.hidden`, !list[index].hidden));
+      commitBoth((list) => setDeep(list, `${index}.hidden`, !list[index]?.hidden));
     },
-    [commit],
+    [commitBoth],
   );
 
   const duplicateSection = useCallback(
     (index: number) => {
-      const list = sectionsRef.current;
-      if (!list) return;
-      const next = list.slice();
-      next.splice(index + 1, 0, withFreshIds(list[index]));
-      commit(next);
+      const t = treesRef.current;
+      if (!t) return;
+      const dupAr = withFreshIds(t.ar[index]);
+      const dupEn = { ...withFreshIds(t.en[index]), id: dupAr.id };
+      const insert = (list: HomeSection[], dup: HomeSection) => {
+        const next = list.slice();
+        next.splice(index + 1, 0, dup);
+        return next;
+      };
+      commit({ ar: insert(t.ar, dupAr), en: insert(t.en, dupEn) });
       selectSection(index + 1, { scroll: false });
     },
     [commit, selectSection],
@@ -276,26 +294,32 @@ export function EditorApp() {
 
   const removeSection = useCallback(
     (index: number) => {
-      const list = sectionsRef.current;
-      if (!list) return;
-      const label = blockDef(list[index].type)?.label ?? list[index].type;
+      const t = treesRef.current;
+      if (!t) return;
+      const label = blockDef(t.ar[index]?.type)?.label ?? t.ar[index]?.type;
       if (!window.confirm(`Delete the "${label}" section? You can undo this.`)) return;
-      commit(list.filter((_, i) => i !== index));
+      commitBoth((list) => list.filter((_, i) => i !== index));
       selectSection(null);
     },
-    [commit, selectSection],
+    [commitBoth, selectSection],
   );
 
   const addSection = useCallback(
     (type: string) => {
-      const list = sectionsRef.current;
+      const t = treesRef.current;
       const def = blockDef(type);
-      if (!list || !def) return;
-      const fresh = { ...def.defaults(localeRef.current), id: newRowId() };
-      const at = selectedRef.current != null ? selectedRef.current + 1 : list.length;
-      const next = list.slice();
-      next.splice(at, 0, fresh);
-      commit(next);
+      if (!t || !def) return;
+      // Pre-fill the new section in BOTH languages.
+      const id = newRowId();
+      const freshAr = { ...def.defaults("ar"), id };
+      const freshEn = { ...def.defaults("en"), id };
+      const at = selectedRef.current != null ? selectedRef.current + 1 : t.ar.length;
+      const insert = (list: HomeSection[], fresh: HomeSection) => {
+        const next = list.slice();
+        next.splice(at, 0, fresh);
+        return next;
+      };
+      commit({ ar: insert(t.ar, freshAr), en: insert(t.en, freshEn) });
       selectSection(at, { scroll: false });
     },
     [commit, selectSection],
@@ -313,36 +337,62 @@ export function EditorApp() {
     [duplicateSection, moveSection, removeSection, selectSection, toggleHidden],
   );
 
-  /** Settings-panel / inline field edit. Path is relative to the section. */
+  /**
+   * Settings-panel field edit. Localized text writes to one language tree;
+   * shared values (links, images, toggles, stat values) write to both.
+   */
   const handleField = useCallback(
-    (index: number, path: string, value: unknown, opts: { refresh?: boolean } = {}) => {
-      const list = sectionsRef.current;
-      if (!list) return;
-      commit(setDeep(list, `${index}.${path}`, value), {
-        refresh: opts.refresh ?? true,
-        coalesceKey: `${index}.${path}`,
-      });
+    (index: number, path: string, value: unknown, scope: FieldScope) => {
+      const t = treesRef.current;
+      if (!t) return;
+      const full = `${index}.${path}`;
+      const next: Trees =
+        scope === "shared"
+          ? { ar: setDeep(t.ar, full, value), en: setDeep(t.en, full, value) }
+          : { ...t, [scope]: setDeep(t[scope], full, value) };
+      commit(next, { coalesceKey: `${scope}:${full}` });
     },
     [commit],
   );
 
-  /* -------------------------------- locale -------------------------------- */
+  /** Array row operations (add/move/remove) apply to both trees in lockstep. */
+  const handleArrayOp = useCallback(
+    (index: number, path: string, op: ArrayOp) => {
+      const full = `${index}.${path}`;
+      commitBoth((list) => {
+        const rows = ((getDeep(list, full) as Record<string, unknown>[]) || []).slice();
+        if (op.kind === "move") {
+          if (op.to < 0 || op.to >= rows.length) return list;
+          const [r] = rows.splice(op.from, 1);
+          rows.splice(op.to, 0, r);
+        } else if (op.kind === "remove") {
+          rows.splice(op.at, 1);
+        } else if (op.kind === "add") {
+          rows.push(JSON.parse(JSON.stringify(op.row)) as Record<string, unknown>);
+        }
+        return setDeep(list, full, rows);
+      });
+    },
+    [commitBoth],
+  );
 
-  const switchLocale = useCallback(
-    async (loc: Locale) => {
-      if (loc === localeRef.current) return;
-      if (saveTimer.current) clearTimeout(saveTimer.current);
-      if (dirtyRef.current) await doSave();
-      localeRef.current = loc;
-      setLocale(loc);
-      document.cookie = `${LOCALE_COOKIE}=${loc};path=/;max-age=31536000;samesite=lax`;
-      selectedRef.current = null;
-      setSelected(null);
-      setAdding(false);
-      await load(loc);
+  /* ----------------------- preview language & pages ----------------------- */
+
+  const switchPreviewLocale = useCallback((loc: Locale) => {
+    if (loc === previewLocaleRef.current) return;
+    previewLocaleRef.current = loc;
+    setPreviewLocale(loc);
+    document.cookie = `${LOCALE_COOKIE}=${loc};path=/;max-age=31536000;samesite=lax`;
+    setIframeKey((k) => k + 1);
+  }, []);
+
+  const switchPage = useCallback(
+    (path: string) => {
+      setPage(path);
+      selectSection(null);
       setIframeKey((k) => k + 1);
     },
-    [doSave, load],
+    [selectSection],
   );
 
   /* --------------------------------- wiring ------------------------------- */
@@ -353,11 +403,11 @@ export function EditorApp() {
       .find((c) => c.startsWith(`${LOCALE_COOKIE}=`))
       ?.split("=")[1];
     const loc: Locale = isLocale(cookie) ? cookie : "ar";
-    localeRef.current = loc;
+    previewLocaleRef.current = loc;
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLocale(loc);
+    setPreviewLocale(loc);
     document.cookie = `${LOCALE_COOKIE}=${loc};path=/;max-age=31536000;samesite=lax`;
-    void load(loc);
+    void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -371,20 +421,33 @@ export function EditorApp() {
         action?: string;
         path?: string;
         value?: string;
+        href?: string;
       };
       if (!msg || msg.ns !== VE_NS) return;
       if (msg.type === "ready") {
         postToIframe({ type: "select", index: selectedRef.current });
+      } else if (msg.type === "open-admin" && msg.href) {
+        window.open(msg.href, "_blank");
       } else if (msg.type === "select-section" && typeof msg.index === "number") {
         selectSection(msg.index, { scroll: false });
       } else if (msg.type === "section-action" && typeof msg.index === "number" && msg.action) {
         handleAction(msg.index, msg.action);
       } else if (msg.type === "text" && msg.path) {
-        const list = sectionsRef.current;
-        if (!list) return;
+        const t = treesRef.current;
+        if (!t) return;
         const rel = msg.path.replace(/^sections\./, "");
-        if (getDeep(list, rel) === msg.value) return;
-        commit(setDeep(list, rel, msg.value ?? ""), { refresh: false, coalesceKey: msg.path });
+        const loc = previewLocaleRef.current;
+        const value = msg.value ?? "";
+        if (isLocalizedField(rel)) {
+          if (getDeep(t[loc], rel) === value) return;
+          commit({ ...t, [loc]: setDeep(t[loc], rel, value) }, { refresh: false, coalesceKey: `${loc}:${rel}` });
+        } else {
+          if (getDeep(t[loc], rel) === value) return;
+          commit(
+            { ar: setDeep(t.ar, rel, value), en: setDeep(t.en, rel, value) },
+            { refresh: false, coalesceKey: `shared:${rel}` },
+          );
+        }
       }
     };
     window.addEventListener("message", onMessage);
@@ -415,7 +478,10 @@ export function EditorApp() {
 
   /* ---------------------------------- UI ---------------------------------- */
 
-  const section = selected != null && sections ? sections[selected] : null;
+  const currentPage = EDITOR_PAGES.find((p) => p.path === page) ?? EDITOR_PAGES[0];
+  const isHome = currentPage.visual === true;
+  const sectionAr = selected != null && trees ? trees.ar[selected] : null;
+  const sectionEn = selected != null && trees ? trees.en[selected] : null;
 
   return (
     <div className="flex h-full flex-col">
@@ -427,12 +493,22 @@ export function EditorApp() {
         >
           <ArrowLeft className="h-4 w-4" /> Dashboard
         </Link>
-        <div className="hidden items-center gap-2 sm:flex">
-          <span className="rounded-md bg-cyan-400/15 px-2 py-0.5 text-xs font-semibold text-cyan-300">
-            Visual Editor
-          </span>
-          <span className="text-sm font-medium text-zinc-200">Home page</span>
-        </div>
+        <span className="hidden rounded-md bg-cyan-400/15 px-2 py-0.5 text-xs font-semibold text-cyan-300 sm:inline">
+          Visual Editor
+        </span>
+
+        {/* Page switcher */}
+        <select
+          value={page}
+          onChange={(e) => switchPage(e.target.value)}
+          className="rounded-lg border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-sm font-medium text-zinc-100 outline-none focus:border-cyan-400"
+        >
+          {EDITOR_PAGES.map((p) => (
+            <option key={p.path} value={p.path}>
+              {p.icon} {p.label}
+            </option>
+          ))}
+        </select>
 
         {/* Device toggle */}
         <div className="mx-auto flex items-center gap-1 rounded-lg bg-zinc-800 p-1">
@@ -457,15 +533,18 @@ export function EditorApp() {
           ))}
         </div>
 
-        {/* Language being edited */}
-        <div className="flex items-center gap-1 rounded-lg bg-zinc-800 p-1 text-xs font-semibold">
+        {/* Preview language (text fields always show BOTH languages) */}
+        <div
+          className="flex items-center gap-1 rounded-lg bg-zinc-800 p-1 text-xs font-semibold"
+          title="Preview language — text fields always show both languages"
+        >
           {(["ar", "en"] as const).map((l) => (
             <button
               key={l}
               type="button"
-              onClick={() => void switchLocale(l)}
+              onClick={() => switchPreviewLocale(l)}
               className={`rounded-md px-2.5 py-1 transition-colors ${
-                locale === l ? "bg-cyan-400 text-cyan-950" : "text-zinc-400 hover:text-zinc-200"
+                previewLocale === l ? "bg-cyan-400 text-cyan-950" : "text-zinc-400 hover:text-zinc-200"
               }`}
             >
               {l === "ar" ? "عربي" : "EN"}
@@ -473,29 +552,31 @@ export function EditorApp() {
           ))}
         </div>
 
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            title="Undo (⌘Z)"
-            onClick={undo}
-            disabled={!canUndo}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-zinc-800 disabled:opacity-30"
-          >
-            <Undo2 className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            title="Redo (⌘⇧Z)"
-            onClick={redo}
-            disabled={!canRedo}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-zinc-800 disabled:opacity-30"
-          >
-            <Redo2 className="h-4 w-4" />
-          </button>
-        </div>
+        {isHome && (
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              title="Undo (⌘Z)"
+              onClick={undo}
+              disabled={!canUndo}
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-zinc-800 disabled:opacity-30"
+            >
+              <Undo2 className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              title="Redo (⌘⇧Z)"
+              onClick={redo}
+              disabled={!canRedo}
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-zinc-800 disabled:opacity-30"
+            >
+              <Redo2 className="h-4 w-4" />
+            </button>
+          </div>
+        )}
 
         {/* Save status */}
-        <div className="flex w-32 items-center justify-end gap-1.5 text-xs">
+        <div className="flex w-28 items-center justify-end gap-1.5 text-xs">
           {status === "saved" && (
             <span className="flex items-center gap-1 text-emerald-400">
               <Check className="h-3.5 w-3.5" /> Saved
@@ -523,37 +604,41 @@ export function EditorApp() {
         </div>
 
         <a
-          href="/"
+          href={page}
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-2.5 py-1.5 text-sm text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white"
         >
-          <ExternalLink className="h-3.5 w-3.5" /> View site
+          <ExternalLink className="h-3.5 w-3.5" /> View
         </a>
       </header>
 
       {/* Body */}
       <div className="flex min-h-0 flex-1">
-        <aside className="flex w-[330px] shrink-0 flex-col overflow-hidden border-e border-zinc-800 bg-zinc-900">
-          {sections == null ? (
+        <aside className="flex w-[360px] shrink-0 flex-col overflow-hidden border-e border-zinc-800 bg-zinc-900">
+          {!isHome ? (
+            <PageInfoPanel page={currentPage} />
+          ) : trees == null ? (
             <div className="flex flex-1 items-center justify-center text-sm text-zinc-500">
               Loading sections…
             </div>
           ) : adding ? (
             <AddSectionPanel onAdd={addSection} onBack={() => setAdding(false)} />
-          ) : section != null && selected != null ? (
+          ) : sectionAr != null && sectionEn != null && selected != null ? (
             <SettingsPanel
-              key={`${section.id ?? selected}-${locale}`}
-              section={section}
+              key={`${sectionAr.id ?? selected}`}
+              sectionAr={sectionAr}
+              sectionEn={sectionEn}
               index={selected}
-              total={sections.length}
+              total={trees.ar.length}
               onField={handleField}
+              onArrayOp={handleArrayOp}
               onAction={handleAction}
               onBack={() => selectSection(null)}
             />
           ) : (
             <SectionListPanel
-              sections={sections}
+              sections={trees[previewLocale]}
               selected={selected}
               onSelect={(i) => selectSection(i)}
               onAdd={() => setAdding(true)}
@@ -568,16 +653,16 @@ export function EditorApp() {
             className="h-full transition-[width] duration-300"
             style={{ width: DEVICE_WIDTH[device], maxWidth: "100%" }}
           >
-            {sections == null ? (
+            {trees == null ? (
               <div className="flex h-full items-center justify-center rounded-xl border border-zinc-800 text-sm text-zinc-500">
                 Loading preview…
               </div>
             ) : (
               <iframe
-                key={iframeKey}
+                key={`${iframeKey}-${page}`}
                 ref={iframeRef}
                 title="Live preview"
-                src="/?ve=1"
+                src={`${page}?ve=1`}
                 className="h-full w-full rounded-xl border border-zinc-800 bg-black"
               />
             )}
