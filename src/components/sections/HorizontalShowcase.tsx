@@ -99,6 +99,7 @@ export function HorizontalShowcase({ projects, heading, editPath }: { projects: 
   const track = useRef<HTMLDivElement>(null);
   const edit = useEditMode();
   const ready = useEditReady();
+  const { dir } = useI18n();
   // In edit mode, render the static carousel so click-to-edit overlays don't
   // fight GSAP's DOM manipulation.
   const reduce = useReducedMotion() || edit;
@@ -115,9 +116,13 @@ export function HorizontalShowcase({ projects, heading, editPath }: { projects: 
     const distance = () =>
       Math.max(0, trackEl.scrollWidth - window.innerWidth + 32);
 
+    // RTL (Arabic) lays the flex track out right-to-left, so its overflow sits
+    // to the LEFT — reveal it by translating the track to the right (+x). LTR
+    // overflows to the right, so it travels left (-x).
+    const sign = dir === "rtl" ? 1 : -1;
     const ctx = gsap.context(() => {
       gsap.to(trackEl, {
-        x: () => -distance(),
+        x: () => sign * distance(),
         ease: "none",
         scrollTrigger: {
           trigger: sectionEl,
@@ -138,7 +143,7 @@ export function HorizontalShowcase({ projects, heading, editPath }: { projects: 
       window.clearTimeout(t);
       ctx.revert();
     };
-  }, [ready, reduce, projects.length]);
+  }, [ready, reduce, projects.length, dir]);
 
   const text = (field: string, value: string) =>
     editPath ? <EditableText path={`${editPath}.${field}`} value={value} /> : value;

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 48" fill="none">
+  <g stroke="#0f172a" stroke-width="2.4" stroke-linecap="round">
+    <circle cx="18" cy="24" r="6"/>
+    <path d="M18 16 V12.5 M18 32 V35.5 M10 24 H6.5 M26 24 H29.5 M23.7 18.3 26.1 15.9 M12.3 18.3 9.9 15.9 M23.7 29.7 26.1 32.1 M12.3 29.7 9.9 32.1"/>
+  </g>
+  <text x="44" y="31" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#0f172a">Lumina</text>
+</svg>

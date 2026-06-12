@@ -96,6 +96,20 @@ export function serializeSections(sections: HomeSection[]): AnyObj[] {
 /* --------------------------- defaults (migration) -------------------------- */
 
 /** Builds the current home page as sections from the legacy globals / seed content. */
+/**
+ * Placeholder client logos shipped as static SVGs in /public/logos, so a freshly
+ * published site (whose home-page global is still empty) shows a populated
+ * "Trusted by leading brands" marquee out of the box — no DB media required.
+ * The site owner replaces these with real client logos in /editor.
+ */
+const defaultLogoItems = [
+  { image: null, imageUrl: "/logos/vertex.svg", name: "Vertex", href: "" },
+  { image: null, imageUrl: "/logos/lumina.svg", name: "Lumina", href: "" },
+  { image: null, imageUrl: "/logos/quanta.svg", name: "Quanta", href: "" },
+  { image: null, imageUrl: "/logos/meridian.svg", name: "Meridian", href: "" },
+  { image: null, imageUrl: "/logos/northwind.svg", name: "Northwind", href: "" },
+];
+
 export async function buildDefaultSections(locale: Locale): Promise<HomeSection[]> {
   const [hero, capabilities, hs, process] = await Promise.all([
     getHero(locale),
@@ -130,7 +144,7 @@ export async function buildDefaultSections(locale: Locale): Promise<HomeSection[
       id: "default-logos",
       type: "logos",
       eyebrow: locale === "ar" ? "موثوقون من علامات رائدة" : "Trusted by leading brands",
-      items: [],
+      items: defaultLogoItems,
     },
     {
       id: "default-capabilities",
