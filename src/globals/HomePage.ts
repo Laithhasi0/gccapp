@@ -83,6 +83,31 @@ const HeroBlock: Block = {
   ],
 };
 
+const LogosBlock: Block = {
+  slug: "logos",
+  labels: { singular: "Client logos", plural: "Client logos" },
+  fields: [
+    hidden,
+    { name: "eyebrow", type: "text", localized: true },
+    {
+      name: "items",
+      type: "array",
+      labels: { singular: "Logo", plural: "Logos" },
+      fields: [
+        { name: "image", type: "upload", relationTo: "media" },
+        { name: "imageUrl", type: "text", admin: { description: "Fallback image path/URL when no upload is set." } },
+        {
+          type: "row",
+          fields: [
+            { name: "name", type: "text" },
+            { name: "href", type: "text" },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 const CapabilitiesBlock: Block = {
   slug: "capabilities",
   labels: { singular: "What we do", plural: "What we do" },
@@ -216,6 +241,7 @@ export const HomePage: GlobalConfig = {
       type: "blocks",
       blocks: [
         HeroBlock,
+        LogosBlock,
         CapabilitiesBlock,
         headingOnlyBlock("services", "Services grid"),
         ProcessBlock,

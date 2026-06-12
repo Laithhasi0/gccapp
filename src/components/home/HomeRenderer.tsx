@@ -1,5 +1,6 @@
 import { Hero } from "@/components/sections/Hero";
 import { CapabilitiesShowcase } from "@/components/sections/CapabilitiesShowcase";
+import { LogoMarquee } from "@/components/sections/LogoMarquee";
 import { ServicesGrid } from "@/components/sections/ServicesGrid";
 import { Process } from "@/components/sections/Process";
 import { CaseStudiesTabs } from "@/components/sections/CaseStudiesTabs";
@@ -56,6 +57,16 @@ function renderSection(s: HomeSection, i: number, ctx: Ctx): React.ReactNode {
         })),
       };
       return <Hero initialData={data} editPath={p} />;
+    }
+    case "logos": {
+      const logos = ((s.items as Record<string, unknown>[]) || [])
+        .map((it) => ({
+          image: img(it.image, it.imageUrl) ?? "",
+          name: str(it.name) || undefined,
+          href: str(it.href) || undefined,
+        }))
+        .filter((it) => it.image);
+      return <LogoMarquee eyebrow={str(s.eyebrow) || undefined} items={logos} editPath={p} />;
     }
     case "capabilities": {
       const items = ((s.items as Record<string, unknown>[]) || []).map((it) => ({

@@ -127,6 +127,12 @@ export async function buildDefaultSections(locale: Locale): Promise<HomeSection[
       stats: hero.stats.filter((s) => s.value || s.label).map((s) => ({ value: s.value ?? "", label: s.label ?? "" })),
     },
     {
+      id: "default-logos",
+      type: "logos",
+      eyebrow: locale === "ar" ? "موثوقون من علامات رائدة" : "Trusted by leading brands",
+      items: [],
+    },
+    {
       id: "default-capabilities",
       type: "capabilities",
       eyebrow: capabilities.eyebrow,

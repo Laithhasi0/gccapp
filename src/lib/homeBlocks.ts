@@ -38,6 +38,7 @@ export const isLocalizedField = (name: string): boolean => {
 
 export type BlockType =
   | "hero"
+  | "logos"
   | "capabilities"
   | "services"
   | "process"
@@ -145,6 +146,32 @@ export const BLOCKS: BlockDef[] = [
       secondaryCta: { label: ar(l) ? "شاهد أعمالنا" : "View Portfolio", href: "/portfolio" },
       showStats: true,
       stats: [],
+    }),
+  },
+  {
+    type: "logos",
+    label: "Client logos",
+    icon: "🤝",
+    description: "A modern scrolling strip of client / partner logos.",
+    fields: [
+      { kind: "text", name: "eyebrow", label: "Small heading", localized: true },
+      {
+        kind: "array",
+        name: "items",
+        label: "Logos",
+        itemLabel: "logo",
+        titleField: "name",
+        fields: [
+          { kind: "image", name: "image", label: "Logo image", urlName: "imageUrl" },
+          { kind: "text", name: "name", label: "Client name" },
+          { kind: "text", name: "href", label: "Link (optional)" },
+        ],
+      },
+    ],
+    defaults: (l) => ({
+      type: "logos",
+      eyebrow: ar(l) ? "موثوقون من علامات رائدة" : "Trusted by leading brands",
+      items: [],
     }),
   },
   {

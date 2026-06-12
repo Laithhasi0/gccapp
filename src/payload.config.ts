@@ -110,6 +110,10 @@ export default buildConfig({
       connectionString:
         process.env.DATABASE_URI || process.env.DATABASE_URL || "postgres://localhost:5432/gccapp",
     },
+    // media_blobs belongs to the postgres media-storage adapter (created via
+    // raw SQL, outside Payload's schema). Without this filter every dev-mode
+    // schema push offers to DELETE it — i.e. all uploaded images.
+    tablesFilter: ["!media_blobs"],
   }),
   sharp,
 });

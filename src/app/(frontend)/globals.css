@@ -267,6 +267,18 @@
   }
 }
 
+/* Infinite client-logos marquee (Visual Editor "Client logos" section) */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@layer utilities {
+  .animate-marquee {
+    animation: marquee var(--marquee-duration, 36s) linear infinite;
+  }
+}
+[dir="rtl"] .animate-marquee { animation-direction: reverse; }
+
 /* Honor reduced motion fully */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
