@@ -7,6 +7,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { replitObjectStorageAdapter } from "./lib/objectStorage";
 import { postgresStorageAdapter } from "./lib/postgresStorage";
+import { ensureBootstrapAdmin } from "./lib/bootstrapAdmin";
 
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
@@ -89,6 +90,9 @@ export default buildConfig({
     }),
   ],
   editor: lexicalEditor(),
+  onInit: async (payload) => {
+    await ensureBootstrapAdmin(payload);
+  },
   secret: process.env.PAYLOAD_SECRET || "dev-secret-change-me",
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
