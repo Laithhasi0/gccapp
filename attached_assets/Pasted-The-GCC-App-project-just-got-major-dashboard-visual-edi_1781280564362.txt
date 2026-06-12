@@ -1,0 +1,48 @@
+The GCC App project just got major dashboard & visual-editor upgrades (already
+coded and tested). Please set everything up on Replit with real data and storage:
+
+WHAT'S NEW (context)
+- /editor: visual editor covering ALL pages (page switcher + navigation into
+  detail pages). Every section, and every individual card (project, service,
+  team member, FAQ, case study, job) shows an "✏️ Edit" chip in the preview.
+  Text fields are edited in Arabic and English side by side.
+- Dashboard "Import website content" button (also POST /api/editor/seed):
+  copies the website's built-in content — Arabic + English + all images — into
+  the CMS collections. Idempotent: collections that already have content are
+  skipped, and the site looks identical after importing.
+- Simplified collections: auto-generated slugs, sidebar order/featured fields,
+  tabbed Project editing, optional team photos, collapsed SEO panels.
+
+TASKS
+1. Pull the latest code, install, and start. Accept Payload's schema push
+   (slug/photo fields became optional — no data loss expected). If the admin UI
+   shows a missing-component error, run: npm run generate:importmap.
+
+2. Storage on Replit:
+   - Use the Replit Postgres database (DATABASE_URI/DATABASE_URL).
+   - Create a Replit Object Storage bucket and set OBJECT_STORAGE_ENABLED=true
+     so all media (including imported images) lives in the bucket.
+   - Confirm PAYLOAD_SECRET and NEXT_PUBLIC_SITE_URL are set.
+
+3. Populate real data: log into /admin and click "⬇️ Import website content"
+   on the dashboard (or POST /api/editor/seed as a logged-in admin). Then
+   verify in the dashboard that Portfolio, Services, Case Studies, FAQs,
+   Careers and Team are all populated WITH Arabic and English text and images.
+
+4. Verify in a real browser, in BOTH languages:
+   - /editor loads; the page switcher shows all pages; clicking a project in
+     the preview opens its detail page inside the editor.
+   - Hovering any card (project/service/team/FAQ) shows the ✏️ chip and it
+     opens that exact item's editor.
+   - Home page: inline text editing, drag-reorder, add/hide/duplicate/delete
+     sections, image picker uploads (must land in Object Storage), undo (Cmd+Z),
+     autosave shows "Saved".
+   - Arabic and English text save separately (edit one, the other unchanged).
+   - The public site renders identically before vs after the import, RTL Arabic
+     by default, English on toggle.
+
+5. Never delete or overwrite existing production content — the importer must
+   only fill empty collections (that's its built-in behavior; don't force it).
+
+6. Optional polish if quick: configure a Resend email adapter for Payload
+   (password resets currently log to console only).
