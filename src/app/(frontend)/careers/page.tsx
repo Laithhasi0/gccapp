@@ -10,11 +10,10 @@ import { getCareers } from "@/lib/cms";
 import { getLocale } from "@/lib/getLocale";
 import { getUI } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "Careers",
-  description:
-    "Join GCC App. We're hiring engineers, designers and marketers who love their craft.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const m = getUI(await getLocale()).meta.careers;
+  return { title: m.title, description: m.description };
+}
 
 export const dynamic = "force-dynamic";
 

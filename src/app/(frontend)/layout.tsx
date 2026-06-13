@@ -36,40 +36,37 @@ const arabic = Cairo({
   weight: ["400", "500", "600", "700"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: {
-    default: "GCC App — Premium Digital Agency",
-    template: "%s · GCC App",
-  },
-  description: site.description,
-  keywords: [
-    "digital agency",
-    "mobile app development",
-    "web development",
-    "e-commerce",
-    "branding",
-    "SEO",
-    "Riyadh",
-    "Saudi Arabia",
-  ],
-  alternates: { canonical: "/" },
-  openGraph: {
-    type: "website",
-    siteName: site.name,
-    title: "GCC App — Premium Digital Agency",
-    description: site.description,
-    url: site.url,
-    images: [{ url: site.ogImage, width: 1200, height: 630, alt: site.name }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "GCC App — Premium Digital Agency",
-    description: site.description,
-    images: [site.ogImage],
-  },
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const m = getUI(locale).meta.root;
+  const keywords =
+    locale === "ar"
+      ? ["وكالة رقمية", "تطوير تطبيقات الجوال", "تطوير مواقع", "تجارة إلكترونية", "هوية تجارية", "تحسين محركات البحث", "الرياض", "السعودية"]
+      : ["digital agency", "mobile app development", "web development", "e-commerce", "branding", "SEO", "Riyadh", "Saudi Arabia"];
+  return {
+    metadataBase: new URL(site.url),
+    title: { default: m.title, template: "%s · GCC App" },
+    description: m.description,
+    keywords,
+    alternates: { canonical: "/" },
+    openGraph: {
+      type: "website",
+      siteName: site.name,
+      title: m.title,
+      description: m.description,
+      url: site.url,
+      locale: locale === "ar" ? "ar_SA" : "en_US",
+      images: [{ url: site.ogImage, width: 1200, height: 630, alt: site.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: m.title,
+      description: m.description,
+      images: [site.ogImage],
+    },
+    robots: { index: true, follow: true },
+  };
+}
 
 export default async function RootLayout({
   children,

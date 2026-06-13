@@ -16,7 +16,16 @@ import {
   faqsAr,
   careersAr,
   teamDataAr,
+  capabilitiesAr,
+  heroDefaultsAr,
+  homeSectionsAr,
+  processMetaAr,
+  processStepsAr,
+  siteDefaultsAr,
+  statsAr,
 } from "@/content/ar";
+import { site, stats as seedStats, processSteps as seedProcessSteps } from "@/content/site";
+import { seedCapabilities, seedHomeSections } from "./cms";
 import { serviceIcons } from "./serviceIcons";
 
 /**
@@ -101,6 +110,253 @@ const iconNameOf = (icon: unknown): string =>
   Object.entries(serviceIcons).find(([, c]) => c === icon)?.[0] ?? "globe";
 
 export type SeedReport = Record<string, string>;
+
+/* ------------------------- Arabic translation repair ------------------------ */
+
+/**
+ * Known English seed phrases → their Arabic translations. An early seeding
+ * script wrote English text into the ARABIC locale of the site-settings and
+ * home-* globals; this maps every such known phrase to the correct Arabic so
+ * it can be repaired in place. Only EXACT matches of these seed strings are
+ * ever touched — anything the user typed themselves is left alone.
+ */
+function buildArabicFixes(): Map<string, string> {
+  const m = new Map<string, string>();
+  const add = (en: string | undefined, ar: string | undefined) => {
+    if (en && ar && en !== ar) m.set(en, ar);
+  };
+
+  // Site settings
+  add("Available for projects", siteDefaultsAr.availabilityText);
+  add("Contact Us", siteDefaultsAr.headerCtaLabel);
+  add(site.contact.address, siteDefaultsAr.address);
+  add(
+    "GCC App delivers innovative digital solutions, apps and services designed to simplify your business operations and boost productivity.",
+    siteDefaultsAr.footerBlurb,
+  );
+
+  // Hero
+  add("Digital solutions agency · Riyadh", heroDefaultsAr.badge);
+  add("Level up your business with", heroDefaultsAr.headline);
+  add(
+    "We build powerful mobile applications, web applications and modern websites that help businesses grow and succeed in the digital world.",
+    heroDefaultsAr.subheading,
+  );
+  add("Get Started", heroDefaultsAr.primaryCtaLabel);
+  add("View Portfolio", heroDefaultsAr.secondaryCtaLabel);
+
+  // Home section headings + CTA
+  for (const key of ["services", "selectedWork", "caseStudies", "team"] as const) {
+    const en = seedHomeSections[key] as { eyebrow: string; title: string; description?: string };
+    const ar = homeSectionsAr[key] as { eyebrow: string; title: string; description?: string };
+    add(en.eyebrow, ar.eyebrow);
+    add(en.title, ar.title);
+    add(en.description, ar.description);
+  }
+  add(seedHomeSections.cta.title, homeSectionsAr.cta.title);
+  add(seedHomeSections.cta.description, homeSectionsAr.cta.description);
+  add(seedHomeSections.cta.buttonLabel, homeSectionsAr.cta.buttonLabel);
+
+  // Process
+  add("How we work", processMetaAr.eyebrow);
+  add("A clear, proven process", processMetaAr.heading);
+  add(
+    "Six calm steps from first conversation to a confident launch — and the support that follows.",
+    processMetaAr.description,
+  );
+  seedProcessSteps.forEach((st, i) => {
+    add(st.title, processStepsAr[i]?.title);
+    add(st.description, processStepsAr[i]?.description);
+  });
+
+  // Capabilities
+  add("What we do", capabilitiesAr.eyebrow);
+  seedCapabilities.forEach((c, i) => {
+    add(c.eyebrow, capabilitiesAr.items[i]?.eyebrow);
+    add(c.title, capabilitiesAr.items[i]?.title);
+    add(c.text, capabilitiesAr.items[i]?.text);
+  });
+
+  // Stats labels
+  seedStats.forEach((st, i) => add(st.label, statsAr[i]?.label));
+
+  return m;
+}
+
+function fixStringsDeep(value: unknown, fixes: Map<string, string>, hits: { n: number }): unknown {
+  if (typeof value === "string") {
+    const fixed = fixes.get(value);
+    if (fixed !== undefined) {
+      hits.n++;
+      return fixed;
+    }
+    return value;
+  }
+  if (Array.isArray(value)) return value.map((v) => fixStringsDeep(v, fixes, hits));
+  if (value && typeof value === "object") {
+    const out: AnyObj = {};
+    for (const [k, v] of Object.entries(value as AnyObj)) out[k] = fixStringsDeep(v, fixes, hits);
+    return out;
+  }
+  return value;
+}
+
+/**
+ * Drops nulls and empty objects so the repair update only carries real values —
+ * otherwise untouched-but-empty required fields (e.g. an unfilled contact
+ * group) make Payload reject the whole update.
+ */
+function pruneEmpty(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(pruneEmpty);
+  if (value && typeof value === "object") {
+    const out: AnyObj = {};
+    for (const [k, v] of Object.entries(value as AnyObj)) {
+      if (v === null || v === undefined) continue;
+      const pv = pruneEmpty(v);
+      if (pv && typeof pv === "object" && !Array.isArray(pv) && Object.keys(pv).length === 0) continue;
+      out[k] = pv;
+    }
+    return out;
+  }
+  return value;
+}
+
+/**
+ * Fills required fields that the legacy seeding left EMPTY in the stored
+ * globals (they fail whole-document validation on any update otherwise).
+ * Only ever writes the same defaults the site already shows via fallbacks,
+ * so nothing changes visually — the documents just become valid + Arabic.
+ */
+function backfillRequired(slug: string, data: AnyObj, locale: "ar" | "en"): number {
+  let n = 0;
+  const isAr = locale === "ar";
+  const fill = (obj: AnyObj, key: string, value: string | undefined) => {
+    if (value && (obj[key] === null || obj[key] === undefined || obj[key] === "")) {
+      obj[key] = value;
+      n++;
+    }
+  };
+  if (slug === "site-settings") {
+    const contact = (data.contact ??= {}) as AnyObj;
+    fill(contact, "email", site.contact.email);
+    fill(contact, "phone", site.contact.phone);
+    fill(contact, "phoneHref", site.contact.phoneHref);
+    fill(contact, "address", isAr ? siteDefaultsAr.address : site.contact.address);
+    fill(data, "availabilityText", isAr ? siteDefaultsAr.availabilityText : "Available for projects");
+    fill(
+      data,
+      "footerBlurb",
+      isAr
+        ? siteDefaultsAr.footerBlurb
+        : "GCC App delivers innovative digital solutions, apps and services designed to simplify your business operations and boost productivity.",
+    );
+    const cta = (data.headerCta ??= {}) as AnyObj;
+    fill(cta, "label", isAr ? siteDefaultsAr.headerCtaLabel : "Contact Us");
+  }
+  if (slug === "home-hero") {
+    fill(data, "headline", isAr ? heroDefaultsAr.headline : "Level up your business with");
+    fill(data, "badge", isAr ? heroDefaultsAr.badge : "Digital solutions agency · Riyadh");
+    fill(
+      data,
+      "subheading",
+      isAr
+        ? heroDefaultsAr.subheading
+        : "We build powerful mobile applications, web applications and modern websites that help businesses grow and succeed in the digital world.",
+    );
+    ((data.stats as AnyObj[]) ?? []).forEach((row, i) =>
+      fill(row, "label", isAr ? statsAr[i]?.label : seedStats[i]?.label),
+    );
+  }
+  if (slug === "home-sections") {
+    for (const key of ["services", "selectedWork", "caseStudies", "team"] as const) {
+      const group = (data[key] ??= {}) as AnyObj;
+      const src = (isAr ? homeSectionsAr[key] : seedHomeSections[key]) as {
+        eyebrow?: string;
+        title?: string;
+        description?: string;
+      };
+      fill(group, "eyebrow", src.eyebrow);
+      fill(group, "title", src.title);
+      fill(group, "description", src.description);
+    }
+    const cta = (data.cta ??= {}) as AnyObj;
+    const ctaSrc = isAr ? homeSectionsAr.cta : seedHomeSections.cta;
+    fill(cta, "title", ctaSrc.title);
+    fill(cta, "description", ctaSrc.description);
+    fill(cta, "buttonLabel", ctaSrc.buttonLabel);
+  }
+  if (slug === "home-process") {
+    fill(data, "eyebrow", isAr ? processMetaAr.eyebrow : "How we work");
+    fill(data, "heading", isAr ? processMetaAr.heading : "A clear, proven process");
+    ((data.steps as AnyObj[]) ?? []).forEach((row, i) => {
+      fill(row, "title", isAr ? processStepsAr[i]?.title : seedProcessSteps[i]?.title);
+      fill(row, "description", isAr ? processStepsAr[i]?.description : seedProcessSteps[i]?.description);
+    });
+  }
+  if (slug === "home-capabilities") {
+    ((data.items as AnyObj[]) ?? []).forEach((row, i) => {
+      const src = isAr ? capabilitiesAr.items[i] : seedCapabilities[i];
+      fill(row, "eyebrow", src?.eyebrow);
+      fill(row, "title", src?.title);
+      fill(row, "text", src?.text);
+    });
+  }
+  return n;
+}
+
+const FIXABLE_GLOBALS = [
+  "site-settings",
+  "home-page",
+  "home-hero",
+  "home-sections",
+  "home-process",
+  "home-capabilities",
+];
+
+/**
+ * Repairs both languages of the fixable globals:
+ *  - Arabic: replaces known English seed phrases saved in the ar locale and
+ *    fills empty required fields with the Arabic defaults.
+ *  - English: fills empty fields with the English defaults, so nothing in the
+ *    en locale falls back to Arabic text.
+ */
+async function repairArabicGlobals(payload: Payload): Promise<number> {
+  const fixes = buildArabicFixes();
+  let total = 0;
+  for (const locale of ["ar", "en"] as const) {
+    for (const slug of FIXABLE_GLOBALS) {
+      try {
+        const doc = (await payload.findGlobal({
+          slug: slug as never,
+          locale,
+          depth: 0,
+          fallbackLocale: false,
+        })) as AnyObj | null;
+        if (!doc) continue;
+        const data: AnyObj = { ...doc };
+        delete data.id;
+        delete data.globalType;
+        delete data.createdAt;
+        delete data.updatedAt;
+        const hits = { n: 0 };
+        const fixed = (locale === "ar" ? fixStringsDeep(data, fixes, hits) : data) as AnyObj;
+        hits.n += backfillRequired(slug, fixed, locale);
+        if (hits.n > 0) {
+          await payload.updateGlobal({
+            slug: slug as never,
+            locale,
+            data: pruneEmpty(fixed) as never,
+          });
+          total += hits.n;
+        }
+      } catch (err) {
+        console.error(`[seed] ${locale} repair failed for`, slug, err);
+      }
+    }
+  }
+  return total;
+}
+
 
 const SEED_LOCK_KEY = 427711; // dedicated advisory-lock id for content auto-seed
 
@@ -413,6 +669,9 @@ export async function importWebsiteContent(payload: Payload): Promise<SeedReport
   } else {
     report.team = "already has content — skipped";
   }
+
+  const repaired = await repairArabicGlobals(payload);
+  report["arabic-text"] = repaired > 0 ? `repaired ${repaired} untranslated values` : "all good";
 
   return report;
 }

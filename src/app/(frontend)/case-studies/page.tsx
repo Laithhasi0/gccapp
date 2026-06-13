@@ -13,11 +13,10 @@ import { getCaseStudies } from "@/lib/cms";
 import { getLocale } from "@/lib/getLocale";
 import { getUI } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "Case Studies",
-  description:
-    "In-depth case studies showing how GCC App delivers measurable results for clients.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const m = getUI(await getLocale()).meta.caseStudies;
+  return { title: m.title, description: m.description };
+}
 
 export const dynamic = "force-dynamic";
 

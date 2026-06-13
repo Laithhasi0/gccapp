@@ -18,11 +18,10 @@ import { getUI } from "@/lib/i18n";
 // Reads team from the CMS at request time so new people appear without a redeploy.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "About",
-  description:
-    "GCC App is a premium digital agency in Riyadh building mobile apps, web apps, e-commerce, branding, marketing and SEO.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const m = getUI(await getLocale()).meta.about;
+  return { title: m.title, description: m.description };
+}
 
 export default async function AboutPage() {
   const [team, hs] = await Promise.all([getTeam(), getHomeSections()]);

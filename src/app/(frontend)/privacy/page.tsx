@@ -5,10 +5,10 @@ import { getUI } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "How GCC App collects, uses and protects your information.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const m = getUI(await getLocale()).meta.privacy;
+  return { title: m.title, description: m.description };
+}
 
 export default async function PrivacyPage() {
   const t = getUI(await getLocale());

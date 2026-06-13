@@ -9,11 +9,10 @@ import { getServices } from "@/lib/cms";
 import { getLocale } from "@/lib/getLocale";
 import { getUI } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "Services",
-  description:
-    "Mobile apps, web design, e-commerce, branding, digital marketing and SEO services from GCC App.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const m = getUI(await getLocale()).meta.services;
+  return { title: m.title, description: m.description };
+}
 
 // CMS-driven — new/edited services appear without a redeploy.
 export const dynamic = "force-dynamic";

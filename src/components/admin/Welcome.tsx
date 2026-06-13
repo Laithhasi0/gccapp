@@ -5,6 +5,7 @@
  * click-to-edit experience. Rendered via `admin.components.beforeDashboard`.
  */
 
+import Link from "next/link";
 import { SeedButton } from "./SeedButton";
 
 const ACCENT = "#25c9e2";
@@ -96,9 +97,9 @@ export function Welcome() {
           </p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-          <a href="/editor" style={{ ...btn(ACCENT, "#06222a"), padding: "0.7rem 1.1rem", fontSize: "0.9rem" }}>
+          <Link href="/editor" style={{ ...btn(ACCENT, "#06222a"), padding: "0.7rem 1.1rem", fontSize: "0.9rem" }}>
             🎨 Open Visual Editor
-          </a>
+          </Link>
           <a href="/" target="_blank" rel="noreferrer" style={{ ...btn("var(--theme-elevation-0)", "var(--theme-text)"), border: "1px solid var(--theme-elevation-150)", padding: "0.7rem 1.1rem", fontSize: "0.9rem" }}>
             👁️ View website
           </a>

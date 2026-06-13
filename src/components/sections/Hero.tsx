@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 import { HeroVisual } from "@/components/three/HeroVisual";
 import { EditableText } from "@/components/edit/EditableText";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { HeroData } from "@/lib/cms";
 
 /**
@@ -23,6 +24,7 @@ export function Hero({
   /** Visual Editor path prefix (e.g. "sections.0") — makes the text inline-editable. */
   editPath?: string;
 }) {
+  const { t } = useI18n();
   const { data } = useLivePreview<HeroData>({
     initialData,
     serverURL: typeof window !== "undefined" ? window.location.origin : "",
@@ -107,7 +109,7 @@ export function Hero({
         <Link
           href="#explore"
           className="pointer-events-auto inline-flex h-9 w-9 animate-bounce items-center justify-center rounded-full border border-border bg-surface/70 text-accent backdrop-blur-sm"
-          aria-label="Scroll to content"
+          aria-label={t.a11y.scrollToContent}
         >
           <ChevronDown className="h-4 w-4" />
         </Link>

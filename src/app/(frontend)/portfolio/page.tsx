@@ -8,11 +8,10 @@ import { getProjects, getProjectCategories } from "@/lib/cms";
 import { getLocale } from "@/lib/getLocale";
 import { getUI } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "Portfolio",
-  description:
-    "Selected work by GCC App across e-commerce, mobile apps, dashboards, branding and web.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const m = getUI(await getLocale()).meta.portfolio;
+  return { title: m.title, description: m.description };
+}
 
 export const dynamic = "force-dynamic";
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X, Phone, ChevronDown, ArrowRight } from "lucide-react";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
@@ -15,6 +16,7 @@ import type { SiteSettings } from "@/lib/cms";
 import { cn } from "@/lib/utils";
 
 export function Header({ settings, nav }: { settings: SiteSettings; nav: NavItem[] }) {
+  const { t } = useI18n();
   // Starts false to match server render (avoids hydration mismatch); the effect
   // syncs the real scroll position on mount.
   const [scrolled, setScrolled] = useState(false);
@@ -67,7 +69,7 @@ export function Header({ settings, nav }: { settings: SiteSettings; nav: NavItem
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
+        <nav className="hidden items-center gap-1 lg:flex" aria-label={t.a11y.mainNav}>
           {nav.map((item) => {
             const active =
               pathname === item.href ||
@@ -201,7 +203,7 @@ export function Header({ settings, nav }: { settings: SiteSettings; nav: NavItem
           >
             <nav
               className="border-t border-border bg-surface px-5 py-4"
-              aria-label="Mobile"
+              aria-label={t.a11y.mobileNav}
               onClick={(e) => {
                 if ((e.target as HTMLElement).closest("a")) setMobileOpen(false);
               }}

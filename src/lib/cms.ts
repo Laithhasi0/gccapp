@@ -387,7 +387,7 @@ export type HomeSectionsData = {
   cta: { title: string; description: string; buttonLabel: string; buttonHref: string };
 };
 
-const seedHomeSections: HomeSectionsData = {
+export const seedHomeSections: HomeSectionsData = {
   services: {
     eyebrow: "What we do",
     title: "Services built around outcomes",
@@ -462,7 +462,7 @@ export type CapabilityItem = {
   href: string;
 };
 
-const seedCapabilities: CapabilityItem[] = [
+export const seedCapabilities: CapabilityItem[] = [
   { image: "/media/images/cap-design.webp", eyebrow: "Design & Brand", title: "Crafted with clarity", text: "Identity systems and interfaces designed around real people — clean, modern and effortless to use.", href: "/services/branding" },
   { image: "/media/images/cap-web.webp", eyebrow: "Web & Mobile", title: "Built to last", text: "Fast, robust web and mobile apps engineered on modern frameworks, with quality and accessibility baked in.", href: "/services/web-design" },
   { image: "/media/images/cap-commerce.webp", eyebrow: "Commerce & Product", title: "Made to scale", text: "Storefronts and digital products that load fast, convert well and grow with your business.", href: "/services/e-commerce" },

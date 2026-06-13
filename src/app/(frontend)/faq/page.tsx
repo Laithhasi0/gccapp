@@ -9,10 +9,10 @@ import { getFaqs } from "@/lib/cms";
 import { getLocale } from "@/lib/getLocale";
 import { getUI } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "FAQ",
-  description: "Answers to common questions about working with GCC App.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const m = getUI(await getLocale()).meta.faq;
+  return { title: m.title, description: m.description };
+}
 
 export const dynamic = "force-dynamic";
 

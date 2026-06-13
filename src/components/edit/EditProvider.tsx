@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 /**
@@ -146,12 +147,12 @@ export function EditProvider({ children }: { children: React.ReactNode }) {
               <span className="text-ink sm:hidden">
                 <strong>Edit mode</strong>
               </span>
-              <a
+              <Link
                 href="/editor"
                 className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-contrast hover:bg-accent-hover"
               >
                 Visual Editor
-              </a>
+              </Link>
               <a
                 href="/admin"
                 target="_blank"

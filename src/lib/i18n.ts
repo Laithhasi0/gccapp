@@ -27,6 +27,29 @@ export type NavItem = { label: string; href: string; children?: NavChild[] };
 
 const en = {
   skipToContent: "Skip to content",
+  a11y: {
+    backToTop: "Back to top",
+    scrollToContent: "Scroll to content",
+    mainNav: "Main",
+    mobileNav: "Mobile",
+  },
+  meta: {
+    root: {
+      title: "GCC App — Premium Digital Agency",
+      description:
+        "GCC App builds high-performance mobile apps, web apps, e-commerce, branding, digital marketing and SEO for ambitious businesses.",
+    },
+    services: { title: "Services", description: "Mobile apps, web design, e-commerce, branding, digital marketing and SEO services from GCC App." },
+    portfolio: { title: "Portfolio", description: "Selected work by GCC App across e-commerce, mobile apps, dashboards, branding and web." },
+    caseStudies: { title: "Case Studies", description: "In-depth case studies showing how GCC App delivers measurable results for clients." },
+    about: { title: "About", description: "GCC App is a premium digital agency in Riyadh building mobile apps, web apps, e-commerce, branding, marketing and SEO." },
+    faq: { title: "FAQ", description: "Answers to common questions about working with GCC App." },
+    careers: { title: "Careers", description: "Join GCC App. We're hiring engineers, designers and marketers who love their craft." },
+    contact: { title: "Contact", description: "Get in touch with GCC App. Tell us about your project and we'll reply within one business day." },
+    privacy: { title: "Privacy Policy", description: "How GCC App collects, uses and protects your information." },
+    terms: { title: "Terms of Service", description: "The terms that govern your use of the GCC App website." },
+  },
+
   lang: { toggleTo: "العربية", current: "English", label: "Language" },
   nav: [
     { label: "Home", href: "/" },
@@ -326,6 +349,29 @@ export type Dict = typeof en;
 
 const ar: Dict = {
   skipToContent: "تخطَّ إلى المحتوى",
+  a11y: {
+    backToTop: "العودة إلى الأعلى",
+    scrollToContent: "انتقل إلى المحتوى",
+    mainNav: "القائمة الرئيسية",
+    mobileNav: "قائمة الجوال",
+  },
+  meta: {
+    root: {
+      title: "GCC App — وكالة رقمية متميزة",
+      description:
+        "تبني GCC App تطبيقات جوال عالية الأداء وتطبيقات ويب ومتاجر إلكترونية وهوية تجارية وتسويقًا رقميًا وتحسين محركات البحث للأعمال الطموحة.",
+    },
+    services: { title: "خدماتنا", description: "تطوير تطبيقات الجوال وتصميم المواقع والتجارة الإلكترونية والهوية التجارية والتسويق الرقمي وتحسين محركات البحث من GCC App." },
+    portfolio: { title: "أعمالنا", description: "أعمال مختارة من GCC App في التجارة الإلكترونية وتطبيقات الجوال ولوحات التحكم والهوية التجارية والويب." },
+    caseStudies: { title: "دراسات الحالة", description: "دراسات حالة معمّقة تُظهر كيف تحقق GCC App نتائج ملموسة لعملائها." },
+    about: { title: "من نحن", description: "GCC App وكالة رقمية متميزة في الرياض تبني تطبيقات الجوال والويب والتجارة الإلكترونية والهوية التجارية والتسويق وتحسين محركات البحث." },
+    faq: { title: "الأسئلة الشائعة", description: "إجابات عن الأسئلة الشائعة حول العمل مع GCC App." },
+    careers: { title: "الوظائف", description: "انضم إلى GCC App — نوظّف مهندسين ومصممين ومسوّقين يحبون عملهم." },
+    contact: { title: "تواصل معنا", description: "تواصل مع GCC App. أخبرنا عن مشروعك وسنرد عليك خلال يوم عمل واحد." },
+    privacy: { title: "سياسة الخصوصية", description: "كيف تجمع GCC App معلوماتك وتستخدمها وتحميها." },
+    terms: { title: "شروط الاستخدام", description: "الشروط التي تحكم استخدامك لموقع GCC App." },
+  },
+
   lang: { toggleTo: "English", current: "العربية", label: "اللغة" },
   nav: [
     { label: "الرئيسية", href: "/" },

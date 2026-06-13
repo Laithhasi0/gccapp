@@ -5,10 +5,10 @@ import { getUI } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Terms of Service",
-  description: "The terms that govern your use of the GCC App website.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const m = getUI(await getLocale()).meta.terms;
+  return { title: m.title, description: m.description };
+}
 
 export default async function TermsPage() {
   const t = getUI(await getLocale());

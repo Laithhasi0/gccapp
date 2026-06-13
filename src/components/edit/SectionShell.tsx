@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowDown, ArrowUp, Copy, EyeOff, Settings2, Trash2 } from "lucide-react";
 import { useEditMode, useVE, vePost } from "./EditProvider";
 
@@ -31,12 +32,12 @@ export function SectionShell({
     return (
       <div className="group/edit relative">
         <div className="pointer-events-none absolute inset-0 z-30 ring-2 ring-accent/0 transition-[box-shadow] duration-200 group-hover/edit:ring-accent/70" />
-        <a
+        <Link
           href="/editor"
           className="absolute end-3 top-3 z-40 inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-contrast opacity-0 shadow-lg transition-opacity duration-200 group-hover/edit:opacity-100 focus-visible:opacity-100"
         >
           <span aria-hidden>✏️</span> Edit {label}
-        </a>
+        </Link>
         {children}
       </div>
     );
